@@ -1,0 +1,4861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>werka.project — visuals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #08080c;
+    --bg2: #0d0d12;
+    --panel: #121218;
+    --border: #1c1c26;
+    --text: #e8e8f0;
+    --muted: #6e6e82;
+    --green: #00ff9d;
+    --green-dim: #00cc7d;
+    --red: #ff3366;
+    --gold: #ffcc33;
+    --purple: #a855f7;
+    --blue: #22d3ee;
+    --pink: #ff2e88;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+body.motion-blur .motion-target { filter: blur(var(--motion-blur, 0px)); transition: filter 0.1s linear; }
+body.motion-fast .motion-target { --motion-blur: 1.5px; }
+body.motion-faster .motion-target { --motion-blur: 3px; }
+
+.motion-target { transition: filter 0.3s cubic-bezier(0.16, 1, 0.3, 1); will-change: filter; }
+
+/* ===== MC-НЕБО ===== */
+.mc-sky {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+        #0a0000 0%,
+        #1a0000 15%,
+        #3d0000 35%,
+        #6b0000 55%,
+        #8b0000 72%,
+        #a00000 85%,
+        #7a0000 100%);
+}
+
+.mc-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* мягкая вуаль, чтобы контент читался */
+.mc-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 50% 30%, transparent 30%, rgba(0, 0, 0, 0.45) 100%),
+        linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.scroll-blur {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    pointer-events: none;
+    z-index: 50;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+}
+
+.scroll-blur.top { top: 0; background: linear-gradient(to bottom, rgba(8, 8, 12, 0.85), transparent); }
+.scroll-blur.bottom { bottom: 0; background: linear-gradient(to top, rgba(8, 8, 12, 0.85), transparent); }
+.scroll-blur.active { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); opacity: 1; }
+
+.device-badge {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 1.1rem;
+    background: rgba(13, 13, 18, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    animation: fadeInUp 1s 1.2s both;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 60, 60, 0.15);
+    contain: layout style paint;
+}
+
+.device-badge:hover {
+    border-color: #ff5555;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 60, 60, 0.3);
+}
+
+.status-led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff5555;
+    box-shadow: 0 0 10px #ff5555;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+}
+
+.device-icon { font-size: 1rem; line-height: 1; }
+.device-info { display: flex; flex-direction: column; gap: 0.1rem; }
+.device-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+.device-name { font-weight: 700; color: #ff5555; font-size: 0.75rem; white-space: nowrap; }
+.device-meta { font-size: 0.6rem; color: var(--muted); margin-top: 0.05rem; }
+
+.msk-clock {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text);
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.msk-clock:hover { border-color: #ff5555; box-shadow: 0 0 15px rgba(255, 60, 60, 0.2); }
+
+.clock-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff5555;
+    box-shadow: 0 0 8px #ff5555;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+}
+
+.clock-time { color: #ff6666; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
+.clock-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 1.5px; font-weight: 800; }
+
+.orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.14;
+    animation: orbFloat 25s ease-in-out infinite;
+    will-change: transform;
+    transform: translateZ(0);
+    contain: strict;
+}
+
+.orb-1 { width: 400px; height: 400px; background: #ff2200; top: -100px; left: -100px; }
+.orb-2 { width: 350px; height: 350px; background: #ff5500; top: 30%; right: -150px; animation-delay: -8s; }
+.orb-3 { width: 300px; height: 300px; background: #aa0000; bottom: -100px; left: 30%; animation-delay: -15s; }
+.orb-4 { width: 320px; height: 320px; background: #ff8800; top: 60%; left: -150px; animation-delay: -12s; }
+
+@keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(50px, -50px) scale(1.1); }
+    66% { transform: translate(-30px, -30px) scale(0.9); }
+}
+
+.cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid #ff5555;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%) translateZ(0);
+    transition: width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: difference;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.cursor.hover { width: 50px; height: 50px; background: rgba(255, 85, 85, 0.15); }
+
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(8, 8, 12, 0.75);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    animation: navSlide 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    gap: 1rem;
+    contain: layout style;
+}
+
+@keyframes navSlide {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #ff5555 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex-shrink: 0;
+}
+
+.logo span {
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links { display: flex; gap: 0.2rem; list-style: none; }
+
+.nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.nav-links a:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+.nav-links a.active { color: #ff5555; background: rgba(255, 85, 85, 0.08); }
+
+.nav-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+
+.cart-btn {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-btn:hover {
+    border-color: #ff5555;
+    color: #ff5555;
+    box-shadow: 0 0 20px rgba(255, 85, 85, 0.2);
+    transform: translateY(-1px);
+}
+
+.cart-count {
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    color: #000;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 0.12rem 0.42rem;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.auth-btn {
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    border: none;
+    padding: 0.55rem 1.1rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 0 20px rgba(255, 85, 85, 0.3);
+}
+
+.auth-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255, 85, 85, 0.6); }
+
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.5rem 0.4rem 0.4rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.user-chip:hover { border-color: #ff5555; }
+.user-chip.is-admin { border-color: rgba(255, 51, 102, 0.5); background: rgba(255, 51, 102, 0.05); box-shadow: 0 0 20px rgba(255, 51, 102, 0.15); }
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.user-avatar.admin { background: linear-gradient(135deg, var(--red), #ff8800); box-shadow: 0 0 15px rgba(255, 51, 102, 0.5); }
+
+.user-info { display: flex; flex-direction: column; line-height: 1.2; padding-right: 0.4rem; }
+
+.user-nickname {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text);
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-status { font-size: 0.6rem; color: #ff5555; font-weight: 600; letter-spacing: 0.5px; }
+.user-status.admin-status { color: var(--red); }
+
+.admin-btn {
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.15), rgba(255, 136, 0, 0.15));
+    border: 1px solid rgba(255, 51, 102, 0.5);
+    color: var(--red);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.admin-btn:hover {
+    background: rgba(255, 51, 102, 0.25);
+    border-color: var(--red);
+    box-shadow: 0 0 25px rgba(255, 51, 102, 0.5);
+    transform: translateY(-2px);
+}
+
+.admin-modal, .confirm-modal, .auth-modal, .apply-modal, .profile-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+
+.admin-modal { z-index: 500; }
+.confirm-modal { z-index: 600; background: rgba(0, 0, 0, 0.9); }
+.auth-modal { z-index: 400; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.apply-modal { z-index: 400; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); overflow-y: auto; }
+.profile-modal { z-index: 400; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+.admin-modal.open, .confirm-modal.open, .auth-modal.open, .apply-modal.open, .profile-modal.open { opacity: 1; pointer-events: all; }
+
+.admin-window, .confirm-window, .auth-window, .apply-window, .profile-window {
+    width: 100%;
+    background: linear-gradient(180deg, var(--bg2), var(--bg));
+    border-radius: 22px;
+    padding: 2.2rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    contain: layout style paint;
+}
+
+.admin-window {
+    max-width: 500px;
+    border: 2px solid var(--red);
+    transform: scale(0.9) translateY(20px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 100px rgba(255, 51, 102, 0.2);
+}
+
+.confirm-window {
+    max-width: 400px;
+    border: 2px solid var(--red);
+    text-align: center;
+    transform: scale(0.9);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 80px rgba(255, 51, 102, 0.3);
+}
+
+.auth-window {
+    max-width: 420px;
+    border: 1px solid var(--border);
+    transform: scale(0.9) translateY(20px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(255, 85, 85, 0.15);
+}
+
+.apply-window {
+    max-width: 500px;
+    border: 1px solid var(--border);
+    transform: scale(0.9) translateY(20px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(255, 136, 0, 0.15);
+    margin: auto;
+    max-height: 95vh;
+    overflow-y: auto;
+}
+
+.profile-window {
+    max-width: 420px;
+    border: 1px solid var(--border);
+    transform: scale(0.9) translateY(20px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+.admin-modal.open .admin-window { transform: scale(1) translateY(0); }
+.confirm-modal.open .confirm-window { transform: scale(1); }
+.auth-modal.open .auth-window { transform: scale(1) translateY(0); }
+.apply-modal.open .apply-window { transform: scale(1) translateY(0); }
+.profile-modal.open .profile-window { transform: scale(1) translateY(0); }
+
+.admin-window::before, .auth-window::before, .apply-window::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    animation: rotate 12s linear infinite;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.admin-window::before { background: conic-gradient(from 0deg, transparent, rgba(255, 51, 102, 0.08), transparent 30%); animation-duration: 8s; }
+.auth-window::before { background: conic-gradient(from 0deg, transparent, rgba(255, 85, 85, 0.07), transparent 30%); }
+.apply-window::before { background: conic-gradient(from 0deg, transparent, rgba(255, 136, 0, 0.07), transparent 30%); }
+
+@keyframes rotate { to { transform: rotate(360deg); } }
+
+.admin-window > *, .confirm-window > *, .auth-window > *, .apply-window > *, .profile-window > * { position: relative; z-index: 1; }
+
+.admin-close, .auth-close, .apply-close, .profile-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 5;
+}
+
+.admin-close { background: rgba(255, 51, 102, 0.1); border: 1px solid rgba(255, 51, 102, 0.3); color: var(--red); }
+.admin-close:hover { background: rgba(255, 51, 102, 0.25); transform: rotate(90deg); }
+
+.auth-close, .apply-close, .profile-close {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.auth-close:hover, .apply-close:hover, .profile-close:hover { border-color: var(--red); color: var(--red); transform: rotate(90deg); }
+
+.admin-header { text-align: center; margin-bottom: 2rem; }
+
+.admin-header-icon { font-size: 3rem; margin-bottom: 0.8rem; display: block; filter: drop-shadow(0 0 20px rgba(255, 51, 102, 0.6)); }
+
+.admin-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    margin-bottom: 0.4rem;
+    background: linear-gradient(135deg, var(--red), #ff8800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255, 51, 102, 0.4));
+}
+
+.admin-subtitle { font-size: 0.82rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; }
+
+.admin-actions { display: flex; flex-direction: column; gap: 0.8rem; }
+
+.admin-action {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: left;
+    font-family: inherit;
+    color: var(--text);
+    width: 100%;
+}
+
+.admin-action:hover {
+    border-color: var(--red);
+    background: rgba(255, 51, 102, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 51, 102, 0.15);
+}
+
+.admin-action.danger:hover { background: rgba(255, 51, 102, 0.1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 51, 102, 0.3); }
+.admin-action.warn:hover { border-color: var(--gold); background: rgba(255, 204, 51, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 204, 51, 0.2); }
+.admin-action.blue:hover { border-color: var(--blue); background: rgba(34, 211, 238, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(34, 211, 238, 0.2); }
+
+.admin-action-icon { font-size: 1.6rem; flex-shrink: 0; width: 40px; text-align: center; }
+.admin-action-info { flex: 1; }
+
+.admin-action-title { font-family: 'Unbounded', sans-serif; font-size: 0.9rem; font-weight: 800; margin-bottom: 0.2rem; color: #fff; }
+.admin-action-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 51, 102, 0.03);
+    border: 1px solid rgba(255, 51, 102, 0.15);
+    border-radius: 14px;
+}
+
+.admin-stat { text-align: center; padding: 0.5rem; }
+
+.admin-stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--red), #ff8800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 0.15rem;
+    letter-spacing: -0.5px;
+}
+
+.admin-stat-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
+
+.admin-danger-zone { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed rgba(255, 51, 102, 0.3); }
+
+.admin-danger-zone h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--red);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+
+.confirm-icon { font-size: 3rem; margin-bottom: 1rem; display: block; animation: bounce 1.5s ease-in-out infinite; }
+
+.confirm-title { font-family: 'Unbounded', sans-serif; font-size: 1.2rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 0.6rem; color: var(--red); }
+.confirm-text { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+.confirm-actions { display: flex; gap: 0.6rem; }
+
+.confirm-btn {
+    flex: 1;
+    padding: 0.85rem;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    letter-spacing: 0.5px;
+}
+
+.confirm-btn.cancel { background: rgba(255, 255, 255, 0.05); color: var(--text); border: 1px solid var(--border); }
+.confirm-btn.cancel:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--muted); }
+.confirm-btn.danger { background: linear-gradient(135deg, var(--red), #cc2255); color: #fff; box-shadow: 0 0 25px rgba(255, 51, 102, 0.4); }
+.confirm-btn.danger:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(255, 51, 102, 0.7); }
+
+.auth-header, .apply-header { text-align: center; margin-bottom: 1.8rem; }
+
+.auth-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    margin-bottom: 0.4rem;
+    background: linear-gradient(135deg, #fff, #ff5555);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-subtitle { font-size: 0.8rem; color: var(--muted); }
+
+.auth-tabs {
+    display: flex;
+    gap: 0.4rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.35rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+}
+
+.auth-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+}
+
+.auth-tab.active { background: linear-gradient(135deg, #ff5555, #cc2222); color: #fff; box-shadow: 0 0 20px rgba(255, 85, 85, 0.4); }
+
+.auth-form, .apply-form { display: flex; flex-direction: column; gap: 1rem; }
+.auth-field, .apply-field { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.auth-field label, .apply-field label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding-left: 0.2rem;
+}
+
+.auth-field input, .apply-field input, .apply-field textarea, .apply-field select {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.85rem 1.1rem;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.apply-field textarea { resize: vertical; min-height: 90px; font-family: inherit; }
+
+.auth-field input:focus { border-color: #ff5555; box-shadow: 0 0 0 4px rgba(255, 85, 85, 0.1); background: rgba(0, 0, 0, 0.6); }
+.apply-field input:focus, .apply-field textarea:focus, .apply-field select:focus { border-color: #ff8800; box-shadow: 0 0 0 4px rgba(255, 136, 0, 0.1); background: rgba(0, 0, 0, 0.6); }
+
+.auth-field input::placeholder, .apply-field input::placeholder, .apply-field textarea::placeholder { color: var(--muted); opacity: 0.6; }
+
+.auth-submit, .apply-submit {
+    border: none;
+    padding: 0.95rem;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-submit { background: linear-gradient(135deg, #ff5555, #cc2222); color: #fff; }
+.apply-submit { background: linear-gradient(135deg, #ff8800, #ff5555); color: #fff; }
+
+.auth-submit::before, .apply-submit::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.7s;
+}
+
+.auth-submit:hover::before, .apply-submit:hover::before { left: 100%; }
+.auth-submit:hover { box-shadow: 0 0 35px rgba(255, 85, 85, 0.6); transform: translateY(-2px); }
+.apply-submit:hover { box-shadow: 0 0 35px rgba(255, 136, 0, 0.6); transform: translateY(-2px); }
+
+.auth-error, .apply-error { font-size: 0.78rem; color: var(--red); text-align: center; min-height: 1.1rem; font-weight: 600; }
+.auth-hint, .apply-hint { font-size: 0.7rem; color: var(--muted); text-align: center; margin-top: 0.5rem; line-height: 1.5; }
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 85, 85, 0.4);
+    background: rgba(255, 85, 85, 0.08);
+    color: #ff8888;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+    animation: fadeInUp 0.9s 0.2s both;
+    box-shadow: 0 0 30px rgba(255, 85, 85, 0.15);
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff5555;
+    box-shadow: 0 0 10px #ff5555;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.hero h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 1.02;
+    letter-spacing: -3px;
+    margin-bottom: 1.8rem;
+    animation: fadeInUp 0.9s 0.35s both;
+}
+
+.hero h1 .line1 { display: block; color: #fff; text-shadow: 0 0 40px rgba(255, 60, 60, 0.4); }
+
+.hero h1 .line2 {
+    display: block;
+    background: linear-gradient(135deg, #ff5555 0%, #ffaa33 50%, #ff3366 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+    filter: drop-shadow(0 0 30px rgba(255, 85, 85, 0.5));
+}
+
+@keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+.hero p {
+    font-size: 1.05rem;
+    color: #c9a8a8;
+    max-width: 560px;
+    margin-bottom: 3rem;
+    line-height: 1.7;
+    animation: fadeInUp 0.9s 0.5s both;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+}
+
+.hero p strong {
+    background: linear-gradient(135deg, #fff, #ff5555);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+.btn-row { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; animation: fadeInUp 0.9s 0.65s both; }
+
+.btn {
+    padding: 0.95rem 2.2rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-green { background: linear-gradient(135deg, #ff5555, #cc2222); color: #fff; box-shadow: 0 0 30px rgba(255, 85, 85, 0.3); }
+
+.btn-green::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #ffaa33, #ff5555);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.btn-green:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 50px rgba(255, 85, 85, 0.6); }
+.btn-green:hover::before { opacity: 1; }
+.btn-green span { position: relative; z-index: 1; }
+
+.btn-ghost {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+}
+
+.btn-ghost:hover { border-color: #ff5555; color: #ff5555; background: rgba(255, 85, 85, 0.05); transform: translateY(-3px); }
+
+.scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    animation: fadeInUp 1s 1s both;
+}
+
+.scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, #ff5555, transparent); animation: scrollPulse 2s infinite; }
+
+@keyframes scrollPulse { 0%, 100% { transform: scaleY(0.3); opacity: 0.5; } 50% { transform: scaleY(1); opacity: 1; } }
+
+.section, .devices-section, .promo-section, .media-section, .partner, .download-section {
+    padding: 7rem 2rem;
+    max-width: 1150px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.devices-section { padding-top: 4rem; padding-bottom: 4rem; }
+.promo-section, .download-section { padding-top: 3rem; padding-bottom: 3rem; }
+
+.reveal { opacity: 0; transform: translateY(50px); transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1); will-change: opacity, transform; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.9rem, 4.5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.9);
+}
+
+.section-title .grad {
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-desc { color: #b09090; max-width: 520px; margin-bottom: 3.5rem; font-size: 0.95rem; line-height: 1.7; text-shadow: 0 2px 15px rgba(0, 0, 0, 0.8); }
+
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.1rem; }
+
+.feature {
+    background: linear-gradient(135deg, rgba(30, 10, 10, 0.85), rgba(15, 5, 5, 0.85));
+    border: 1px solid rgba(255, 60, 60, 0.15);
+    border-radius: 18px;
+    padding: 2rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    contain: layout style paint;
+}
+
+.feature::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 0%, rgba(255, 85, 85, 0.1), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.feature::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, #ff5555, transparent);
+    transform: scaleX(0);
+    transition: transform 0.6s;
+}
+
+.feature:hover::before { opacity: 1; }
+.feature:hover::after { transform: scaleX(1); }
+
+.feature:hover {
+    border-color: rgba(255, 85, 85, 0.4);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 85, 85, 0.12);
+}
+
+.feature-icon { font-size: 1.7rem; margin-bottom: 1.2rem; display: block; transition: transform 0.5s; }
+.feature:hover .feature-icon { transform: scale(1.15) rotate(-8deg); }
+.feature h3 { font-family: 'Unbounded', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.6rem; }
+.feature p { font-size: 0.85rem; color: #a88888; line-height: 1.65; }
+
+.devices-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+
+.device-card {
+    background: linear-gradient(135deg, rgba(30, 10, 10, 0.9), rgba(15, 5, 5, 0.9));
+    border: 1px solid rgba(255, 60, 60, 0.15);
+    border-radius: 18px;
+    padding: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    contain: layout style paint;
+}
+
+.device-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 0% 50%, rgba(255, 85, 85, 0.12), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+}
+
+.device-card:hover::before { opacity: 1; }
+.device-card:hover { border-color: rgba(255, 85, 85, 0.4); transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 85, 85, 0.15); }
+
+.device-card-icon { font-size: 2rem; flex-shrink: 0; filter: drop-shadow(0 0 15px rgba(255, 85, 85, 0.5)); transition: transform 0.5s; }
+.device-card:hover .device-card-icon { transform: scale(1.15) rotate(-5deg); }
+
+.device-card-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    background: linear-gradient(135deg, #fff, #ff5555);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.device-card-desc { font-size: 0.8rem; color: #a88888; line-height: 1.5; }
+
+.device-card-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #ff5555;
+    background: rgba(255, 85, 85, 0.1);
+    border: 1px solid rgba(255, 85, 85, 0.3);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    margin-top: 0.6rem;
+    display: inline-block;
+}
+
+.promo-box {
+    background: linear-gradient(135deg, rgba(255, 85, 85, 0.08), rgba(255, 136, 0, 0.08));
+    border: 1px solid rgba(255, 85, 85, 0.25);
+    border-radius: 20px;
+    padding: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(15px);
+    contain: layout style paint;
+}
+
+.promo-box::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(255, 85, 85, 0.12), transparent 30%);
+    animation: rotate 8s linear infinite;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.promo-box > * { position: relative; z-index: 1; }
+.promo-box h3 { font-family: 'Unbounded', sans-serif; font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem; }
+.promo-box p { color: #b09090; font-size: 0.85rem; }
+
+.promo-input-wrap { display: flex; gap: 0.5rem; flex: 1; min-width: 280px; max-width: 420px; }
+
+.promo-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 85, 85, 0.3);
+    color: #fff;
+    padding: 0.85rem 1.1rem;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.promo-input:focus { border-color: #ff5555; box-shadow: 0 0 0 4px rgba(255, 85, 85, 0.15); background: rgba(0, 0, 0, 0.7); }
+.promo-input::placeholder { text-transform: none; letter-spacing: 0.5px; color: var(--muted); font-weight: 400; }
+
+.promo-btn {
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    border: none;
+    padding: 0.85rem 1.6rem;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.promo-btn:hover { box-shadow: 0 0 30px rgba(255, 85, 85, 0.6); transform: translateY(-2px); }
+
+.promo-message { width: 100%; font-size: 0.8rem; padding: 0.3rem 0; min-height: 1.2rem; font-weight: 600; }
+.promo-message.success { color: #55ff88; }
+.promo-message.error { color: #ff5555; }
+
+.products { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.3rem; }
+
+.product {
+    background: linear-gradient(135deg, rgba(30, 10, 10, 0.9), rgba(15, 5, 5, 0.9));
+    border: 1px solid rgba(255, 60, 60, 0.15);
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    contain: layout style paint;
+}
+
+.product::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--glow, rgba(255, 85, 85, 0.15)), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.6s;
+    pointer-events: none;
+}
+
+.product:hover::before { opacity: 1; }
+.product:hover { border-color: var(--glow-border, rgba(255, 85, 85, 0.4)); transform: translateY(-8px) scale(1.01); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); }
+
+.product.premium {
+    border: 1.5px solid rgba(255, 204, 51, 0.5);
+    background: linear-gradient(135deg, rgba(30, 22, 10, 0.95), rgba(20, 14, 8, 0.95));
+    box-shadow: 0 0 40px rgba(255, 204, 51, 0.15), inset 0 0 40px rgba(255, 204, 51, 0.03);
+    animation: premiumShine 4s ease-in-out infinite;
+}
+
+@keyframes premiumShine {
+    0%, 100% { box-shadow: 0 0 40px rgba(255, 204, 51, 0.15), inset 0 0 40px rgba(255, 204, 51, 0.03); border-color: rgba(255, 204, 51, 0.5); }
+    50% { box-shadow: 0 0 60px rgba(255, 204, 51, 0.35), inset 0 0 60px rgba(255, 204, 51, 0.06); border-color: rgba(255, 204, 51, 0.8); }
+}
+
+.product.premium::before { background: radial-gradient(circle at 50% 0%, rgba(255, 204, 51, 0.18), transparent 55%); opacity: 1; }
+
+.product.premium:hover {
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(255, 204, 51, 0.4);
+    transform: translateY(-10px) scale(1.02);
+    animation: none;
+    border-color: var(--gold);
+}
+
+.premium-crown {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--gold), #ffaa00);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    box-shadow: 0 5px 25px rgba(255, 204, 51, 0.5), 0 0 40px rgba(255, 204, 51, 0.3);
+    white-space: nowrap;
+    animation: crownPulse 2.5s ease-in-out infinite;
+    z-index: 5;
+}
+
+@keyframes crownPulse {
+    0%, 100% { box-shadow: 0 5px 25px rgba(255, 204, 51, 0.5), 0 0 40px rgba(255, 204, 51, 0.3); }
+    50% { box-shadow: 0 5px 25px rgba(255, 204, 51, 0.8), 0 0 60px rgba(255, 204, 51, 0.5); }
+}
+
+.product-tag {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    z-index: 2;
+}
+
+.tag-def { background: rgba(255, 85, 85, 0.15); color: #ff5555; border: 1px solid rgba(255, 85, 85, 0.3); }
+.tag-top { background: rgba(255, 204, 51, 0.15); color: var(--gold); border: 1px solid rgba(255, 204, 51, 0.3); }
+.tag-plus { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+
+.crystal-wrap {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+    contain: layout style paint;
+}
+
+.crystal-wrap.small { width: 70px; height: 70px; }
+.crystal-wrap.large { width: 110px; height: 110px; }
+
+.crystal {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    animation: crystalFloat 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px var(--crystal-color)) drop-shadow(0 0 30px var(--crystal-color));
+    transition: filter 0.6s;
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+.product:hover .crystal-wrap { transform: scale(1.15) rotate(-8deg); }
+
+.product:hover .crystal {
+    filter: drop-shadow(0 0 25px var(--crystal-color)) drop-shadow(0 0 50px var(--crystal-color));
+    animation-duration: 2s;
+}
+
+@keyframes crystalFloat {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+.crystal-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -15px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--crystal-color) 0%, transparent 60%);
+    opacity: 0.35;
+    filter: blur(15px);
+    animation: crystalGlow 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+    will-change: opacity, transform;
+}
+
+@keyframes crystalGlow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.15); }
+}
+
+.crystal-spark {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--crystal-color);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--crystal-color);
+    pointer-events: none;
+    animation: sparkFloat 3s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+.crystal-spark:nth-child(2) { top: 10%; left: -15%; animation-delay: 0s; }
+.crystal-spark:nth-child(3) { top: 50%; right: -15%; animation-delay: 1s; }
+.crystal-spark:nth-child(4) { bottom: 10%; left: 10%; animation-delay: 2s; }
+.crystal-spark:nth-child(5) { top: -15%; right: 20%; animation-delay: 1.5s; }
+
+@keyframes sparkFloat {
+    0%, 100% { opacity: 0; transform: scale(0) translateY(0); }
+    50% { opacity: 1; transform: scale(1) translateY(-5px); }
+}
+
+@media (max-width: 640px) {
+    .crystal-wrap { width: 70px; height: 70px; margin-bottom: 0.9rem; }
+    .crystal-wrap.small { width: 60px; height: 60px; }
+    .crystal-wrap.large { width: 85px; height: 85px; }
+}
+
+.product-name { font-size: 0.68rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #a88888; margin-bottom: 0.4rem; }
+
+.product h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.9rem;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.product.premium h3 {
+    font-size: 1.35rem;
+    background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 204, 51, 0.3));
+}
+
+.product-desc { font-size: 0.85rem; color: #a88888; line-height: 1.65; margin-bottom: 1.8rem; flex: 1; }
+.product.premium .product-desc { color: #c9b078; }
+
+.product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.4rem;
+    border-top: 1px solid rgba(255, 60, 60, 0.15);
+    position: relative;
+    z-index: 1;
+}
+
+.product.premium .product-footer { border-top-color: rgba(255, 204, 51, 0.2); }
+
+.price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    transition: all 0.4s;
+}
+
+.price small { font-size: 0.85rem; font-weight: 500; color: var(--muted); margin-left: 0.1rem; }
+.price-current { display: inline-block; animation: pricePop 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.price-old {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--red);
+    text-decoration-thickness: 2px;
+    letter-spacing: -0.5px;
+    opacity: 0.75;
+    animation: priceOld 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.price-discount-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: var(--red);
+    color: #fff;
+    padding: 0.18rem 0.42rem;
+    border-radius: 5px;
+    margin-left: 0.15rem;
+    animation: pricePop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 12px rgba(255, 51, 102, 0.5);
+    align-self: center;
+}
+
+@keyframes pricePop { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes priceOld { from { opacity: 0; transform: translateX(-8px); } to { opacity: 0.75; transform: translateX(0); } }
+
+.buy {
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 10px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.buy::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s;
+}
+
+.buy:hover::before { left: 100%; }
+.buy:hover { box-shadow: 0 0 30px rgba(255, 85, 85, 0.6); transform: translateY(-2px) scale(1.03); }
+
+.product.premium .buy { background: linear-gradient(135deg, var(--gold), #ffaa00); color: #000; box-shadow: 0 0 25px rgba(255, 204, 51, 0.4); }
+.product.premium .buy:hover { box-shadow: 0 0 50px rgba(255, 204, 51, 0.8); transform: translateY(-3px) scale(1.05); }
+
+.media-hero {
+    background: linear-gradient(135deg, rgba(255, 85, 85, 0.1), rgba(255, 136, 0, 0.1), rgba(255, 51, 102, 0.1));
+    border: 1px solid rgba(255, 85, 85, 0.3);
+    border-radius: 26px;
+    padding: 3.5rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    margin-bottom: 2rem;
+    contain: layout style paint;
+}
+
+.media-hero::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: conic-gradient(from 0deg, #ff5555, #ffaa33, #ff3366, #ff5555);
+    background-size: 300% 300%;
+    border-radius: 26px;
+    z-index: -1;
+    animation: borderRotate 10s linear infinite;
+    opacity: 0.55;
+    will-change: background-position;
+}
+
+.media-hero::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    background: linear-gradient(135deg, #140808, #0a0404);
+    border-radius: 25px;
+    z-index: -1;
+}
+
+@keyframes borderRotate { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+
+.media-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 85, 85, 0.15);
+    border: 1px solid rgba(255, 85, 85, 0.4);
+    color: #ff8888;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.media-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, #ff8888 40%, #ffaa33 70%, #ff3366 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 5s ease infinite;
+    filter: drop-shadow(0 2px 20px rgba(0, 0, 0, 0.8));
+}
+
+.media-desc { color: #b09090; max-width: 580px; margin: 0 auto 2.5rem; font-size: 0.95rem; line-height: 1.7; }
+.media-stats { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
+
+.media-stat {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem 1.5rem;
+    min-width: 130px;
+}
+
+.media-stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ff8888, #ffaa33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.media-stat-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
+
+.media-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.9rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 30px rgba(255, 85, 85, 0.4);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.media-cta::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    transition: left 0.7s;
+}
+
+.media-cta:hover::before { left: 100%; }
+.media-cta:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 55px rgba(255, 85, 85, 0.7); }
+
+.media-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+
+.media-feature {
+    background: linear-gradient(135deg, rgba(30, 10, 10, 0.85), rgba(15, 5, 5, 0.85));
+    border: 1px solid rgba(255, 60, 60, 0.15);
+    border-radius: 16px;
+    padding: 1.8rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    contain: layout style paint;
+}
+
+.media-feature::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, #ff5555, #ffaa33);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s;
+}
+
+.media-feature:hover::before { transform: scaleX(1); }
+.media-feature:hover { border-color: rgba(255, 85, 85, 0.4); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); }
+
+.media-feature-icon { font-size: 1.5rem; margin-bottom: 1rem; display: block; transition: transform 0.5s; }
+.media-feature:hover .media-feature-icon { transform: scale(1.15) rotate(-8deg); }
+.media-feature h4 { font-family: 'Unbounded', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; }
+.media-feature p { font-size: 0.82rem; color: #a88888; line-height: 1.6; }
+
+.partner-card {
+    background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 136, 0, 0.1));
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    border-radius: 24px;
+    padding: 3.5rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(15px);
+    contain: layout style paint;
+}
+
+.partner-card::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: linear-gradient(45deg, #ff3366, #ffaa33, #ff5555, #ff3366);
+    background-size: 400% 400%;
+    border-radius: 24px;
+    z-index: -1;
+    animation: borderGlow 6s linear infinite;
+    opacity: 0.5;
+    will-change: background-position;
+}
+
+.partner-card::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    background: linear-gradient(135deg, #140808, #0a0404);
+    border-radius: 23px;
+    z-index: -1;
+}
+
+@keyframes borderGlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+.partner-icon { font-size: 2.5rem; margin-bottom: 1.2rem; display: block; animation: bounce 3s ease-in-out infinite; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.partner-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff, #ff8888, #ffaa33);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 5s ease infinite;
+}
+
+.partner-desc { color: #b09090; max-width: 520px; margin: 0 auto 2rem; font-size: 0.95rem; line-height: 1.7; }
+.partner-perks { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
+
+.perk {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.perk:hover { border-color: #ff5555; color: #ff5555; transform: translateY(-2px); }
+
+.tg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.9rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 30px rgba(255, 85, 85, 0.4);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.tg-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.7s;
+}
+
+.tg-btn:hover::before { left: 100%; }
+.tg-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 50px rgba(255, 85, 85, 0.7); }
+
+.creator {
+    text-align: center;
+    padding: 7rem 2rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+    z-index: 2;
+}
+
+.creator-label { font-size: 0.7rem; letter-spacing: 5px; text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem; }
+
+.creator-name {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -2.5px;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #fff 0%, #ff5555 40%, #ffaa33 70%, #ff3366 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 5s ease infinite;
+    filter: drop-shadow(0 0 40px rgba(255, 85, 85, 0.3));
+}
+
+.creator p { color: #b09090; max-width: 420px; margin: 0 auto 2rem; font-size: 0.9rem; line-height: 1.7; }
+.creator p strong { color: #fff; font-weight: 700; }
+
+footer {
+    padding: 2.5rem 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    position: relative;
+    z-index: 2;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+footer span {
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+.cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+
+.cart-overlay.open { opacity: 1; pointer-events: all; }
+
+.cart-panel {
+    position: fixed;
+    top: 0;
+    right: -440px;
+    width: 420px;
+    max-width: 100%;
+    height: 100vh;
+    background: linear-gradient(180deg, var(--bg2), var(--bg));
+    border-left: 1px solid var(--border);
+    z-index: 201;
+    transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    contain: layout style paint;
+}
+
+.cart-panel.open { right: 0; }
+
+.cart-header {
+    padding: 1.6rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-header h3 { font-family: 'Unbounded', sans-serif; font-size: 1.05rem; font-weight: 800; }
+
+.cart-close {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.cart-close:hover { border-color: var(--red); color: var(--red); transform: rotate(90deg); }
+
+.cart-items { flex: 1; overflow-y: auto; padding: 1rem; }
+
+.cart-empty { text-align: center; padding: 4rem 1rem; color: var(--muted); font-size: 0.9rem; }
+
+.cart-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1.1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 0.8rem;
+    align-items: center;
+    animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s;
+}
+
+.cart-item:hover { border-color: rgba(255, 85, 85, 0.25); background: rgba(255, 255, 255, 0.03); }
+
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+.cart-item-sword { width: 38px; height: 38px; flex-shrink: 0; filter: drop-shadow(0 0 8px currentColor); }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem; }
+.cart-item-price { font-size: 0.75rem; color: var(--muted); }
+.cart-item-price .old-price { text-decoration: line-through; color: var(--muted); margin-right: 0.35rem; opacity: 0.7; }
+.cart-item-price .new-price { color: #55ff88; font-weight: 700; }
+.cart-item-qty { display: flex; align-items: center; gap: 0.4rem; }
+
+.qty-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+}
+
+.qty-btn:hover { border-color: #ff5555; color: #ff5555; background: rgba(255, 85, 85, 0.08); }
+.qty-num { font-size: 0.85rem; font-weight: 700; min-width: 22px; text-align: center; }
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.3rem;
+    transition: all 0.3s;
+}
+
+.cart-item-remove:hover { color: var(--red); transform: rotate(90deg); }
+
+.cart-footer { padding: 1.6rem; border-top: 1px solid var(--border); background: rgba(0, 0, 0, 0.3); }
+
+.cart-promo-applied {
+    font-size: 0.75rem;
+    color: #55ff88;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+}
+
+.cart-discount {
+    font-size: 0.75rem;
+    color: var(--red);
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--border);
+}
+
+.cart-total-label { font-size: 0.9rem; color: var(--muted); }
+
+.cart-total-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.checkout-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+}
+
+.checkout-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.7s;
+}
+
+.checkout-btn:hover::before { left: 100%; }
+.checkout-btn:hover { box-shadow: 0 0 35px rgba(255, 85, 85, 0.6); transform: translateY(-2px); }
+
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(120px) translateZ(0);
+    background: rgba(20, 20, 26, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid #ff5555;
+    color: var(--text);
+    padding: 0.9rem 1.6rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 700;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 35px rgba(255, 85, 85, 0.5);
+    will-change: transform;
+}
+
+.toast.show { transform: translateX(-50%) translateY(0) translateZ(0); }
+
+.profile-header { text-align: center; margin-bottom: 1.5rem; padding-top: 0.5rem; }
+
+.profile-avatar-big {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    margin: 0 auto 1rem;
+    box-shadow: 0 0 30px rgba(255, 85, 85, 0.4);
+}
+
+.profile-avatar-big.admin { background: linear-gradient(135deg, var(--red), #ff8800); box-shadow: 0 0 30px rgba(255, 51, 102, 0.5); }
+.profile-nickname { font-family: 'Unbounded', sans-serif; font-size: 1.2rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 0.3rem; }
+.profile-email { font-size: 0.8rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin: 1.5rem 0; }
+
+.profile-stat {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem;
+    text-align: center;
+}
+
+.profile-stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff5555, #ffaa33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 0.15rem;
+}
+
+.profile-stat-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+
+.profile-logout {
+    width: 100%;
+    background: rgba(255, 51, 102, 0.1);
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    color: var(--red);
+    padding: 0.85rem;
+    border-radius: 12px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.profile-logout:hover { background: rgba(255, 51, 102, 0.2); border-color: var(--red); box-shadow: 0 0 25px rgba(255, 51, 102, 0.3); }
+
+.file-upload { position: relative; }
+
+.file-upload input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.file-upload-label:hover { border-color: #ff5555; background: rgba(255, 85, 85, 0.05); }
+.file-upload-label .file-icon { font-size: 1.6rem; display: block; }
+.file-upload-label .file-text { font-size: 0.82rem; color: var(--text); font-weight: 600; }
+.file-upload-label .file-hint { font-size: 0.7rem; color: var(--muted); }
+.file-upload-label.has-file { border-color: #55ff88; border-style: solid; background: rgba(85, 255, 136, 0.05); }
+
+.download-box {
+    background: linear-gradient(135deg, rgba(255, 85, 85, 0.07), rgba(255, 136, 0, 0.07));
+    border: 1px solid rgba(255, 85, 85, 0.3);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(15px);
+    contain: layout style paint;
+}
+
+.download-box::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(255, 85, 85, 0.1), transparent 30%);
+    animation: rotate 12s linear infinite;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.download-box > * { position: relative; z-index: 1; }
+.download-header { text-align: center; margin-bottom: 2rem; }
+
+.download-header h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    margin-bottom: 0.6rem;
+    background: linear-gradient(135deg, #fff, #ff5555);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.download-header p { color: #b09090; font-size: 0.9rem; max-width: 460px; margin: 0 auto; }
+
+.key-form { display: flex; gap: 0.6rem; max-width: 480px; margin: 0 auto 1rem; flex-wrap: wrap; }
+
+.key-input {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 85, 85, 0.3);
+    color: #ff8888;
+    padding: 1rem 1.3rem;
+    border-radius: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    outline: none;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.key-input:focus { border-color: #ff5555; box-shadow: 0 0 0 4px rgba(255, 85, 85, 0.15); background: rgba(0, 0, 0, 0.7); }
+.key-input::placeholder { text-transform: none; letter-spacing: 0.5px; color: var(--muted); font-weight: 400; text-align: center; }
+
+.key-btn {
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 25px rgba(255, 85, 85, 0.4);
+}
+
+.key-btn:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(255, 85, 85, 0.7); }
+
+.key-message { text-align: center; font-size: 0.85rem; min-height: 1.3rem; font-weight: 600; max-width: 480px; margin: 0 auto; }
+.key-message.success { color: #55ff88; }
+.key-message.error { color: #ff5555; }
+
+.access-block {
+    display: none;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 85, 85, 0.2);
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.access-block.visible { display: block; }
+
+.access-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 999px;
+    background: rgba(85, 255, 136, 0.1);
+    border: 1px solid rgba(85, 255, 136, 0.3);
+    color: #55ff88;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.access-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #55ff88;
+    box-shadow: 0 0 8px #55ff88;
+    animation: pulse 2s infinite;
+}
+
+.access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+@media (max-width: 700px) { .access-grid { grid-template-columns: 1fr; } }
+
+.access-col h4 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.access-col h4::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: linear-gradient(180deg, #ff5555, #ffaa33);
+    border-radius: 2px;
+}
+
+.access-col ol { padding-left: 1.2rem; font-size: 0.85rem; color: #a88888; line-height: 1.8; }
+.access-col ol li { margin-bottom: 0.5rem; }
+.access-col ol li strong { color: var(--text); }
+.access-col ol code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255, 85, 85, 0.1);
+    color: #ff8888;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.password-box {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.1rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.password-box-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; flex-shrink: 0; }
+.password-box-value { flex: 1; color: #ff8888; font-weight: 700; font-size: 0.95rem; letter-spacing: 1px; }
+
+.password-copy {
+    background: rgba(255, 85, 85, 0.1);
+    border: 1px solid rgba(255, 85, 85, 0.3);
+    color: #ff8888;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.password-copy:hover { background: rgba(255, 85, 85, 0.2); box-shadow: 0 0 15px rgba(255, 85, 85, 0.4); }
+
+.download-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+
+.download-big-btn {
+    flex: 1;
+    min-width: 220px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    background: linear-gradient(135deg, #ff5555, #cc2222);
+    color: #fff;
+    border: none;
+    padding: 1.2rem 2rem;
+    border-radius: 14px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 30px rgba(255, 85, 85, 0.5);
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.download-big-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transition: left 0.7s;
+}
+
+.download-big-btn:hover::before { left: 100%; }
+.download-big-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 60px rgba(255, 85, 85, 0.8); }
+
+.download-alt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 1.2rem 1.8rem;
+    border-radius: 14px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.download-alt-btn:hover { border-color: #ff5555; color: #ff5555; background: rgba(255, 85, 85, 0.05); }
+
+.access-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border);
+    line-height: 1.6;
+}
+
+.access-note strong { color: #fff; }
+
+@media (max-width: 1100px) {
+    .msk-clock { padding: 0.45rem 0.7rem; font-size: 0.7rem; }
+    .clock-label { display: none; }
+}
+
+@media (max-width: 900px) {
+    nav { padding: 0.85rem 1.5rem; }
+    .nav-links { gap: 0.1rem; }
+    .nav-links a { padding: 0.45rem 0.7rem; font-size: 0.78rem; }
+    .cart-btn { padding: 0.45rem 0.85rem; font-size: 0.78rem; }
+    .msk-clock { padding: 0.4rem 0.6rem; font-size: 0.68rem; }
+
+    .section, .partner, .media-section, .devices-section, .promo-section, .download-section { padding: 5rem 1.5rem; }
+    .hero { padding: 7rem 1.5rem 4rem; }
+    .products { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .features, .media-features { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .devices-grid { grid-template-columns: 1fr; }
+    .partner-card, .media-hero { padding: 2.5rem 1.8rem; }
+    .promo-box { padding: 1.8rem; }
+    .device-badge { bottom: 1rem; right: 1rem; padding: 0.55rem 0.9rem; font-size: 0.65rem; }
+    .download-box { padding: 2rem 1.5rem; }
+}
+
+@media (max-width: 700px) {
+    .nav-links { display: none; }
+}
+
+@media (max-width: 640px) {
+    nav { padding: 0.7rem 0.85rem; gap: 0.3rem; flex-wrap: nowrap; }
+    .logo { font-size: 0.85rem; letter-spacing: -0.3px; flex-shrink: 0; }
+    .nav-right { gap: 0.35rem; }
+
+    .msk-clock { padding: 0.35rem 0.5rem; font-size: 0.62rem; gap: 0.35rem; }
+    .clock-dot { width: 5px; height: 5px; }
+
+    .cart-btn { padding: 0.45rem 0.6rem; font-size: 0.7rem; gap: 0.3rem; flex-shrink: 0; }
+    .cart-count { font-size: 0.55rem; padding: 0.1rem 0.32rem; min-width: 15px; }
+
+    .auth-btn { padding: 0.45rem 0.75rem; font-size: 0.7rem; }
+    .admin-btn { padding: 0.45rem 0.7rem; font-size: 0.68rem; }
+    .user-chip { padding: 0.28rem 0.35rem 0.28rem 0.28rem; }
+    .user-avatar { width: 24px; height: 24px; font-size: 0.72rem; border-radius: 6px; }
+    .user-nickname { font-size: 0.68rem; max-width: 60px; }
+    .user-status { font-size: 0.52rem; }
+    .user-info { padding-right: 0.15rem; }
+
+    .hero { padding: 6rem 1rem 3rem; min-height: auto; }
+    .hero-badge { font-size: 0.62rem; padding: 0.35rem 0.9rem; letter-spacing: 1px; margin-bottom: 1.5rem; }
+    .hero h1 { font-size: clamp(2rem, 11vw, 3rem); letter-spacing: -1.5px; margin-bottom: 1.2rem; }
+    .hero p { font-size: 0.9rem; margin-bottom: 2rem; padding: 0 0.5rem; }
+
+    .btn-row { flex-direction: column; width: 100%; gap: 0.6rem; }
+    .btn { justify-content: center; width: 100%; padding: 0.85rem 1.5rem; font-size: 0.85rem; }
+    .scroll-hint { display: none; }
+
+    .section, .partner, .media-section, .devices-section, .promo-section, .download-section { padding: 4rem 1rem; }
+    .section-label { font-size: 0.6rem; letter-spacing: 3px; margin-bottom: 0.9rem; }
+    .section-title { font-size: clamp(1.5rem, 6.5vw, 2rem); letter-spacing: -1px; margin-bottom: 0.8rem; }
+    .section-desc { font-size: 0.85rem; margin-bottom: 2.2rem; }
+
+    .features, .media-features { grid-template-columns: 1fr; gap: 0.8rem; }
+    .feature, .media-feature { padding: 1.5rem; }
+    .feature-icon, .media-feature-icon { font-size: 1.4rem; margin-bottom: 0.9rem; }
+    .feature h3, .media-feature h4 { font-size: 0.9rem; }
+    .feature p, .media-feature p { font-size: 0.78rem; }
+
+    .devices-grid { grid-template-columns: 1fr; gap: 0.7rem; }
+    .device-card { padding: 1.3rem; gap: 0.9rem; border-radius: 14px; }
+    .device-card-icon { font-size: 1.6rem; }
+    .device-card-title { font-size: 0.85rem; }
+    .device-card-desc { font-size: 0.72rem; line-height: 1.45; }
+    .device-card-badge { font-size: 0.55rem; padding: 0.2rem 0.5rem; }
+
+    .promo-box { flex-direction: column; align-items: stretch; padding: 1.5rem; gap: 1.2rem; border-radius: 16px; }
+    .promo-box h3 { font-size: 1rem; }
+    .promo-box p { font-size: 0.78rem; }
+    .promo-input-wrap { max-width: 100%; min-width: 0; width: 100%; flex-direction: column; }
+    .promo-input { width: 100%; padding: 0.8rem 1rem; font-size: 0.85rem; }
+    .promo-btn { width: 100%; padding: 0.8rem; }
+    .promo-message { font-size: 0.75rem; }
+
+    .products { grid-template-columns: 1fr; gap: 0.9rem; }
+    .product { padding: 1.5rem; border-radius: 16px; }
+    .product-tag { top: 1rem; right: 1rem; font-size: 0.55rem; padding: 0.25rem 0.55rem; }
+    .product-name { font-size: 0.6rem; letter-spacing: 2px; }
+    .product h3 { font-size: 1rem; margin-bottom: 0.7rem; }
+    .product.premium h3 { font-size: 1.15rem; }
+    .product-desc { font-size: 0.78rem; margin-bottom: 1.3rem; }
+
+    .product-footer { flex-direction: row; justify-content: space-between; align-items: center; gap: 0.8rem; padding-top: 1.1rem; flex-wrap: wrap; }
+    .price { font-size: 1.35rem; letter-spacing: -1px; gap: 0.25rem; }
+    .price small { font-size: 0.72rem; }
+    .price-old { font-size: 0.75rem; }
+    .price-discount-badge { font-size: 0.5rem; padding: 0.15rem 0.35rem; }
+    .buy { padding: 0.65rem 1.1rem; font-size: 0.72rem; border-radius: 9px; flex-shrink: 0; }
+
+    .premium-crown { font-size: 0.55rem; padding: 0.28rem 0.8rem; top: -12px; }
+
+    .media-hero { padding: 2rem 1.3rem; border-radius: 20px; margin-bottom: 1.3rem; }
+    .media-badge { font-size: 0.6rem; padding: 0.3rem 0.85rem; margin-bottom: 1rem; }
+    .media-title { font-size: clamp(1.4rem, 6.5vw, 1.9rem); letter-spacing: -1px; margin-bottom: 0.8rem; }
+    .media-desc { font-size: 0.85rem; margin-bottom: 1.8rem; }
+    .media-stats { flex-direction: row; gap: 0.6rem; margin-bottom: 1.8rem; }
+    .media-stat { min-width: 0; flex: 1; padding: 0.7rem 0.5rem; border-radius: 12px; }
+    .media-stat-num { font-size: 1rem; letter-spacing: -0.5px; }
+    .media-stat-label { font-size: 0.55rem; letter-spacing: 1px; }
+    .media-cta { padding: 0.85rem 1.3rem; font-size: 0.78rem; width: 100%; justify-content: center; border-radius: 12px; }
+
+    .partner-card { padding: 2rem 1.3rem; border-radius: 20px; }
+    .partner-icon { font-size: 2rem; margin-bottom: 0.9rem; }
+    .partner-title { font-size: clamp(1.3rem, 6vw, 1.7rem); letter-spacing: -0.8px; }
+    .partner-desc { font-size: 0.85rem; margin-bottom: 1.6rem; }
+    .partner-perks { gap: 0.5rem; margin-bottom: 1.8rem; }
+    .perk { font-size: 0.7rem; padding: 0.5rem 0.9rem; border-radius: 8px; }
+    .tg-btn { padding: 0.85rem 1.3rem; font-size: 0.78rem; width: 100%; justify-content: center; border-radius: 12px; }
+
+    .creator { padding: 4rem 1rem; }
+    .creator-label { font-size: 0.6rem; letter-spacing: 3px; margin-bottom: 0.8rem; }
+    .creator-name { font-size: clamp(1.8rem, 8vw, 2.5rem); letter-spacing: -1.5px; margin-bottom: 0.9rem; }
+    .creator p { font-size: 0.8rem; }
+
+    footer { padding: 1.8rem 1rem; font-size: 0.65rem; letter-spacing: 1px; }
+
+    .cart-panel { width: 100%; right: -100%; }
+    .cart-header { padding: 1.2rem; }
+    .cart-header h3 { font-size: 0.95rem; }
+    .cart-item { padding: 0.9rem; gap: 0.7rem; border-radius: 12px; }
+    .cart-item-sword { width: 30px; height: 30px; }
+    .cart-item-name { font-size: 0.78rem; }
+    .cart-item-price { font-size: 0.7rem; }
+    .qty-btn { width: 24px; height: 24px; font-size: 0.8rem; }
+    .qty-num { font-size: 0.78rem; min-width: 18px; }
+    .cart-item-remove { font-size: 0.9rem; }
+    .cart-footer { padding: 1.2rem; }
+    .cart-total-price { font-size: 1.3rem; }
+    .checkout-btn { padding: 0.9rem; font-size: 0.82rem; }
+
+    .cursor { display: none; }
+    .orb { opacity: 0.1; }
+
+    .toast {
+        bottom: 1rem;
+        left: 1rem;
+        right: 1rem;
+        transform: translateX(0) translateY(120px);
+        padding: 0.8rem 1.2rem;
+        font-size: 0.78rem;
+        text-align: center;
+    }
+    .toast.show { transform: translateX(0) translateY(0); }
+
+    .device-badge { bottom: 0.75rem; right: 0.75rem; padding: 0.5rem 0.75rem; gap: 0.5rem; border-radius: 11px; }
+    .device-badge .device-icon { font-size: 0.9rem; }
+    .device-badge .device-label { font-size: 0.5rem; letter-spacing: 1.5px; }
+    .device-badge .device-name { font-size: 0.65rem; }
+    .device-badge .device-meta { font-size: 0.52rem; }
+
+    .scroll-blur { height: 80px; }
+
+    .auth-window, .apply-window, .profile-window, .admin-window, .confirm-window { padding: 1.6rem; border-radius: 18px; }
+    .auth-title, .apply-title { font-size: 1.15rem; }
+    .auth-field input, .apply-field input, .apply-field textarea, .apply-field select { padding: 0.75rem 1rem; font-size: 0.85rem; }
+    .auth-submit, .apply-submit { padding: 0.85rem; font-size: 0.82rem; }
+    .apply-field textarea { min-height: 75px; }
+
+    .download-box { padding: 1.8rem 1.2rem; }
+    .download-header h3 { font-size: 1.15rem; }
+    .download-header p { font-size: 0.82rem; }
+    .key-form { flex-direction: column; }
+    .key-input { width: 100%; padding: 0.9rem 1rem; font-size: 0.9rem; }
+    .key-btn { width: 100%; padding: 0.9rem; }
+    .password-box { flex-wrap: wrap; }
+    .password-box-value { width: 100%; order: 2; }
+    .password-copy { order: 3; width: 100%; text-align: center; padding: 0.5rem; }
+    .download-big-btn, .download-alt-btn { width: 100%; min-width: 0; }
+}
+
+@media (max-width: 480px) { .msk-clock { display: none; } }
+
+@media (max-width: 380px) {
+    .logo { font-size: 0.78rem; }
+    .cart-btn { padding: 0.4rem 0.5rem; font-size: 0.62rem; }
+    .auth-btn { padding: 0.4rem 0.55rem; font-size: 0.62rem; }
+    .admin-btn { padding: 0.4rem 0.55rem; font-size: 0.6rem; }
+    .user-nickname { max-width: 45px; }
+    .hero h1 { font-size: 1.9rem; }
+
+    .media-stats { flex-direction: column; gap: 0.5rem; }
+    .media-stat { padding: 0.6rem; }
+    .media-stat-num { font-size: 1.1rem; }
+
+    .product-footer { flex-direction: column; align-items: stretch; }
+    .buy { width: 100%; text-align: center; justify-content: center; }
+    .price { justify-content: center; text-align: center; }
+
+    .device-badge { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; }
+}
+
+/* ===== SEMKA ===== */
+.semka-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.2) 0%, rgba(15, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0.98) 80%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+    overflow: hidden;
+    contain: strict;
+}
+
+.semka-overlay.active { opacity: 1; pointer-events: all; }
+
+.semka-flash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.9), rgba(255, 80, 80, 0.5) 30%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.semka-overlay.active .semka-flash { animation: semkaFlash 1.2s ease-out; }
+
+@keyframes semkaFlash {
+    0% { opacity: 1; transform: scale(0.2); }
+    60% { opacity: 0.6; transform: scale(1.5); }
+    100% { opacity: 0; transform: scale(3); }
+}
+
+.semka-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+.semka-accretion {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 480px; height: 480px;
+    margin: -240px 0 0 -240px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0%, rgba(255, 100, 50, 0.9) 10%, rgba(255, 180, 80, 1) 20%, rgba(255, 220, 150, 1) 25%, rgba(255, 180, 80, 1) 30%, rgba(255, 100, 50, 0.9) 40%, transparent 50%, rgba(255, 80, 80, 0.8) 60%, rgba(255, 200, 100, 0.9) 70%, rgba(255, 80, 80, 0.8) 80%, transparent 90%, transparent 100%);
+    filter: blur(8px);
+    animation: accretionSpin 8s linear infinite, accretionPulse 3s ease-in-out infinite, accretionAppear 1s ease-out forwards;
+    opacity: 0;
+    will-change: transform, opacity, filter;
+}
+
+@keyframes accretionAppear { from { opacity: 0; transform: scale(0.5); } to { opacity: 0.9; transform: scale(1); } }
+@keyframes accretionSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes accretionPulse { 0%, 100% { filter: blur(8px); } 50% { filter: blur(12px); } }
+
+.semka-accretion-thin {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 420px; height: 420px;
+    margin: -210px 0 0 -210px;
+    border-radius: 50%;
+    background: conic-gradient(from 90deg, transparent 0%, rgba(255, 200, 100, 0.9) 15%, rgba(255, 255, 200, 1) 20%, rgba(255, 200, 100, 0.9) 25%, transparent 40%, rgba(255, 150, 100, 0.9) 60%, rgba(255, 220, 200, 1) 65%, rgba(255, 150, 100, 0.9) 70%, transparent 85%);
+    filter: blur(4px);
+    opacity: 0;
+    animation: accretionSpinReverse 5s linear infinite, accretionAppear 1.2s 0.2s ease-out forwards;
+    will-change: transform, opacity;
+}
+
+@keyframes accretionSpinReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+
+.semka-lens {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 700px; height: 700px;
+    margin: -350px 0 0 -350px;
+    border-radius: 50%;
+    background: radial-gradient(circle, transparent 30%, rgba(255, 50, 50, 0.15) 42%, rgba(180, 20, 20, 0.08) 52%, transparent 70%);
+    animation: lensRotate 20s linear infinite, lensAppear 1.5s 0.3s ease-out forwards;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+@keyframes lensAppear { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+@keyframes lensRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.semka-hole {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 260px; height: 260px;
+    margin: -130px 0 0 -130px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #000 0%, #000 55%, rgba(25, 0, 0, 0.98) 70%, rgba(80, 10, 10, 0.7) 85%, transparent 100%);
+    box-shadow: 0 0 40px 15px rgba(255, 60, 60, 0.6), 0 0 100px 40px rgba(180, 20, 20, 0.4), 0 0 180px 80px rgba(140, 0, 0, 0.3), inset 0 0 80px rgba(0, 0, 0, 1), inset 0 0 40px rgba(120, 20, 20, 0.5);
+    animation: holePulse 3s ease-in-out infinite;
+    z-index: 3;
+    will-change: box-shadow;
+}
+
+@keyframes holePulse {
+    0%, 100% { box-shadow: 0 0 40px 15px rgba(255, 60, 60, 0.6), 0 0 100px 40px rgba(180, 20, 20, 0.4), 0 0 180px 80px rgba(140, 0, 0, 0.3), inset 0 0 80px rgba(0, 0, 0, 1), inset 0 0 40px rgba(120, 20, 20, 0.5); }
+    50% { box-shadow: 0 0 60px 25px rgba(255, 80, 80, 0.8), 0 0 140px 60px rgba(220, 30, 30, 0.6), 0 0 240px 100px rgba(180, 10, 10, 0.4), inset 0 0 100px rgba(0, 0, 0, 1), inset 0 0 60px rgba(180, 40, 40, 0.7); }
+}
+
+.semka-horizon {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 280px; height: 280px;
+    margin: -140px 0 0 -140px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, #ff5555, #ffaa33, #ff3366, #ff5555) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    filter: blur(1px);
+    animation: horizonRotate 4s linear infinite, horizonAppear 0.8s 0.3s ease-out forwards;
+    z-index: 4;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+@keyframes horizonAppear { from { opacity: 0; } to { opacity: 1; } }
+@keyframes horizonRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.semka-chain { position: absolute; top: 50%; left: 50%; transform-origin: 0 0; pointer-events: none; z-index: 5; will-change: transform; }
+.semka-chain-orbit { position: absolute; top: 0; left: 0; width: 0; height: 0; }
+
+.semka-link {
+    position: absolute;
+    top: 0; left: 0;
+    width: 26px; height: 34px;
+    margin: -17px 0 0 -13px;
+    border-radius: 8px;
+    border: 3px solid;
+    background: transparent;
+    box-shadow: inset 0 0 6px currentColor, 0 0 8px currentColor, 0 0 16px currentColor;
+}
+
+.semka-link::before { content: ''; position: absolute; inset: 2px; border-radius: 6px; border: 1px solid currentColor; opacity: 0.5; }
+
+.semka-chain-1 .semka-link { color: #ff3366; border-color: #ff3366; filter: drop-shadow(0 0 8px #ff3366); }
+.semka-chain-2 .semka-link { color: #ff8800; border-color: #ff8800; filter: drop-shadow(0 0 8px #ff8800); }
+.semka-chain-3 .semka-link { color: #ff5555; border-color: #ff5555; filter: drop-shadow(0 0 8px #ff5555); }
+.semka-chain-4 .semka-link { color: #ffcc33; border-color: #ffcc33; filter: drop-shadow(0 0 8px #ffcc33); }
+
+.semka-chain-1 { animation: chainSpin1 4s linear infinite; }
+.semka-chain-2 { animation: chainSpin2 6s linear infinite; }
+.semka-chain-3 { animation: chainSpin3 8s linear infinite; }
+.semka-chain-4 { animation: chainSpin4 10s linear infinite; }
+
+@keyframes chainSpin1 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes chainSpin2 { from { transform: rotate(90deg); } to { transform: rotate(-270deg); } }
+@keyframes chainSpin3 { from { transform: rotate(180deg); } to { transform: rotate(540deg); } }
+@keyframes chainSpin4 { from { transform: rotate(45deg); } to { transform: rotate(-315deg); } }
+
+.semka-chain-1 .semka-link:nth-child(1) { transform: rotate(0deg) translateX(170px) rotate(90deg); }
+.semka-chain-1 .semka-link:nth-child(2) { transform: rotate(30deg) translateX(170px) rotate(120deg); }
+.semka-chain-1 .semka-link:nth-child(3) { transform: rotate(60deg) translateX(170px) rotate(150deg); }
+.semka-chain-1 .semka-link:nth-child(4) { transform: rotate(90deg) translateX(170px) rotate(180deg); }
+.semka-chain-1 .semka-link:nth-child(5) { transform: rotate(120deg) translateX(170px) rotate(210deg); }
+.semka-chain-1 .semka-link:nth-child(6) { transform: rotate(150deg) translateX(170px) rotate(240deg); }
+.semka-chain-1 .semka-link:nth-child(7) { transform: rotate(180deg) translateX(170px) rotate(270deg); }
+.semka-chain-1 .semka-link:nth-child(8) { transform: rotate(210deg) translateX(170px) rotate(300deg); }
+.semka-chain-1 .semka-link:nth-child(9) { transform: rotate(240deg) translateX(170px) rotate(330deg); }
+.semka-chain-1 .semka-link:nth-child(10) { transform: rotate(270deg) translateX(170px) rotate(360deg); }
+.semka-chain-1 .semka-link:nth-child(11) { transform: rotate(300deg) translateX(170px) rotate(390deg); }
+.semka-chain-1 .semka-link:nth-child(12) { transform: rotate(330deg) translateX(170px) rotate(420deg); }
+
+.semka-chain-2 .semka-link:nth-child(1) { transform: rotate(0deg) translateX(220px) rotate(90deg); }
+.semka-chain-2 .semka-link:nth-child(2) { transform: rotate(30deg) translateX(220px) rotate(120deg); }
+.semka-chain-2 .semka-link:nth-child(3) { transform: rotate(60deg) translateX(220px) rotate(150deg); }
+.semka-chain-2 .semka-link:nth-child(4) { transform: rotate(90deg) translateX(220px) rotate(180deg); }
+.semka-chain-2 .semka-link:nth-child(5) { transform: rotate(120deg) translateX(220px) rotate(210deg); }
+.semka-chain-2 .semka-link:nth-child(6) { transform: rotate(150deg) translateX(220px) rotate(240deg); }
+.semka-chain-2 .semka-link:nth-child(7) { transform: rotate(180deg) translateX(220px) rotate(270deg); }
+.semka-chain-2 .semka-link:nth-child(8) { transform: rotate(210deg) translateX(220px) rotate(300deg); }
+.semka-chain-2 .semka-link:nth-child(9) { transform: rotate(240deg) translateX(220px) rotate(330deg); }
+.semka-chain-2 .semka-link:nth-child(10) { transform: rotate(270deg) translateX(220px) rotate(360deg); }
+.semka-chain-2 .semka-link:nth-child(11) { transform: rotate(300deg) translateX(220px) rotate(390deg); }
+.semka-chain-2 .semka-link:nth-child(12) { transform: rotate(330deg) translateX(220px) rotate(420deg); }
+
+.semka-chain-3 .semka-link:nth-child(1) { transform: rotate(0deg) translateX(270px) rotate(90deg); }
+.semka-chain-3 .semka-link:nth-child(2) { transform: rotate(30deg) translateX(270px) rotate(120deg); }
+.semka-chain-3 .semka-link:nth-child(3) { transform: rotate(60deg) translateX(270px) rotate(150deg); }
+.semka-chain-3 .semka-link:nth-child(4) { transform: rotate(90deg) translateX(270px) rotate(180deg); }
+.semka-chain-3 .semka-link:nth-child(5) { transform: rotate(120deg) translateX(270px) rotate(210deg); }
+.semka-chain-3 .semka-link:nth-child(6) { transform: rotate(150deg) translateX(270px) rotate(240deg); }
+.semka-chain-3 .semka-link:nth-child(7) { transform: rotate(180deg) translateX(270px) rotate(270deg); }
+.semka-chain-3 .semka-link:nth-child(8) { transform: rotate(210deg) translateX(270px) rotate(300deg); }
+.semka-chain-3 .semka-link:nth-child(9) { transform: rotate(240deg) translateX(270px) rotate(330deg); }
+.semka-chain-3 .semka-link:nth-child(10) { transform: rotate(270deg) translateX(270px) rotate(360deg); }
+.semka-chain-3 .semka-link:nth-child(11) { transform: rotate(300deg) translateX(270px) rotate(390deg); }
+.semka-chain-3 .semka-link:nth-child(12) { transform: rotate(330deg) translateX(270px) rotate(420deg); }
+
+.semka-chain-4 .semka-link:nth-child(1) { transform: rotate(0deg) translateX(320px) rotate(90deg); }
+.semka-chain-4 .semka-link:nth-child(2) { transform: rotate(30deg) translateX(320px) rotate(120deg); }
+.semka-chain-4 .semka-link:nth-child(3) { transform: rotate(60deg) translateX(320px) rotate(150deg); }
+.semka-chain-4 .semka-link:nth-child(4) { transform: rotate(90deg) translateX(320px) rotate(180deg); }
+.semka-chain-4 .semka-link:nth-child(5) { transform: rotate(120deg) translateX(320px) rotate(210deg); }
+.semka-chain-4 .semka-link:nth-child(6) { transform: rotate(150deg) translateX(320px) rotate(240deg); }
+.semka-chain-4 .semka-link:nth-child(7) { transform: rotate(180deg) translateX(320px) rotate(270deg); }
+.semka-chain-4 .semka-link:nth-child(8) { transform: rotate(210deg) translateX(320px) rotate(300deg); }
+.semka-chain-4 .semka-link:nth-child(9) { transform: rotate(240deg) translateX(320px) rotate(330deg); }
+.semka-chain-4 .semka-link:nth-child(10) { transform: rotate(270deg) translateX(320px) rotate(360deg); }
+.semka-chain-4 .semka-link:nth-child(11) { transform: rotate(300deg) translateX(320px) rotate(390deg); }
+.semka-chain-4 .semka-link:nth-child(12) { transform: rotate(330deg) translateX(320px) rotate(420deg); }
+
+.semka-particle {
+    position: absolute;
+    top: 50%; left: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+    animation: semkaParticleFall 2.4s cubic-bezier(0.5, 0, 0.9, 1) forwards;
+    transform-origin: 0 0;
+    will-change: transform, opacity;
+}
+
+@keyframes semkaParticleFall {
+    0% { transform: rotate(var(--start-angle)) translateX(var(--start-r)) scale(1); opacity: 0; }
+    15% { opacity: 1; }
+    70% { opacity: 0.9; }
+    100% { transform: rotate(calc(var(--start-angle) + 540deg)) translateX(60px) scale(0.1); opacity: 0; }
+}
+
+.semka-particle.stretch { height: 3px; border-radius: 999px; }
+
+.semka-nick {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 900;
+    letter-spacing: 10px;
+    background: linear-gradient(135deg, #fff 0%, #ffaa33 15%, #ff3366 30%, #ff5555 50%, #ffaa33 70%, #ff3366 85%, #fff 100%);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: semkaNickGradient 4s ease infinite, semkaNickAppear 1.2s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    filter: drop-shadow(0 0 20px rgba(255, 60, 60, 1)) drop-shadow(0 0 40px rgba(255, 136, 0, 0.7)) drop-shadow(0 0 60px rgba(255, 51, 102, 0.5));
+    text-align: center;
+    padding: 0 1rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+@keyframes semkaNickAppear {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); letter-spacing: 40px; }
+    60% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); letter-spacing: 12px; }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); letter-spacing: 10px; }
+}
+
+@keyframes semkaNickGradient { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+.semka-nick::before {
+    content: 'SEMKA';
+    position: absolute;
+    inset: 0;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.5);
+    filter: blur(0.5px);
+    pointer-events: none;
+    z-index: -1;
+    animation: semkaGlitch 0.4s infinite;
+    letter-spacing: 10px;
+    padding: 0 1rem;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.semka-nick::after {
+    content: 'SEMKA';
+    position: absolute;
+    inset: 0;
+    -webkit-text-fill-color: rgba(255, 60, 60, 0.4);
+    filter: blur(20px);
+    pointer-events: none;
+    z-index: -2;
+    letter-spacing: 10px;
+    padding: 0 1rem;
+    text-align: center;
+    white-space: nowrap;
+}
+
+@keyframes semkaGlitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-3px, 1px); }
+    40% { transform: translate(3px, -1px); }
+    60% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+    100% { transform: translate(0); }
+}
+
+.semka-wave {
+    position: absolute;
+    top: 50%; left: 50%;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 60, 60, 0.7);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.semka-overlay.active .semka-wave { animation: waveExpand 3s ease-out infinite; }
+.semka-wave:nth-child(1) { animation-delay: 0s !important; }
+.semka-wave:nth-child(2) { animation-delay: 1s !important; }
+.semka-wave:nth-child(3) { animation-delay: 2s !important; }
+
+@keyframes waveExpand {
+    0% { width: 260px; height: 260px; margin: -130px 0 0 -130px; opacity: 0.9; border-width: 3px; border-color: rgba(255, 60, 60, 0.9); }
+    100% { width: 900px; height: 900px; margin: -450px 0 0 -450px; opacity: 0; border-width: 1px; border-color: rgba(255, 136, 0, 0.3); }
+}
+
+@media (max-width: 640px) {
+    .semka-hole { width: 160px; height: 160px; margin: -80px 0 0 -80px; }
+    .semka-horizon { width: 180px; height: 180px; margin: -90px 0 0 -90px; }
+    .semka-accretion { width: 300px; height: 300px; margin: -150px 0 0 -150px; }
+    .semka-accretion-thin { width: 260px; height: 260px; margin: -130px 0 0 -130px; }
+    .semka-lens { width: 450px; height: 450px; margin: -225px 0 0 -225px; }
+    .semka-nick { font-size: 2.4rem; letter-spacing: 5px; }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .orb, .mc-canvas { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="mc-sky"></div>
+<canvas class="mc-canvas" id="mcCanvas"></canvas>
+<div class="mc-vignette"></div>
+
+<div class="scroll-blur top" id="blurTop"></div>
+<div class="scroll-blur bottom" id="blurBottom"></div>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="orb orb-4"></div>
+
+<div class="cursor" id="cursor"></div>
+
+<div class="device-badge" id="deviceBadge" title="Информация о твоём устройстве">
+    <span class="status-led"></span>
+    <span class="device-icon" id="deviceIcon">💻</span>
+    <div class="device-info">
+        <span class="device-label">Connected</span>
+        <span class="device-name" id="deviceName">Определение...</span>
+        <span class="device-meta" id="deviceMeta">—</span>
+    </div>
+</div>
+
+<nav>
+    <div class="logo">werka<span>.project</span></div>
+    <ul class="nav-links">
+        <li><a href="#products" class="active">Товары</a></li>
+        <li><a href="#download">Скачать</a></li>
+        <li><a href="#devices">Устройства</a></li>
+        <li><a href="#media">Медиа</a></li>
+        <li><a href="#partner">Партнёрам</a></li>
+        <li><a href="#creator">Создатель</a></li>
+    </ul>
+    <div class="nav-right">
+        <div class="msk-clock" id="mskClock" title="Текущее время по Москве">
+            <span class="clock-dot"></span>
+            <span class="clock-time" id="clockTime">--:--:--</span>
+            <span class="clock-label">МСК</span>
+        </div>
+        <button class="cart-btn" onclick="toggleCart()">
+            🛒 <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <div id="adminSlot"></div>
+        <div id="authSlot"></div>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="hero-badge">
+        <span class="dot"></span>
+        Visuals · 1.21.8
+    </div>
+
+    <h1 class="motion-target">
+        <span class="line1">Твои идеальные</span>
+        <span class="line2">визуалы</span>
+    </h1>
+
+    <p class="motion-target">
+        Эстетичная графика для Minecraft без лагов. Создаём <strong>werka.project</strong> — 
+        визуалы, которые меняют твой взгляд на игру.
+    </p>
+
+    <div class="btn-row motion-target">
+        <a href="#products" class="btn btn-green"><span>⚡ Смотреть товары</span></a>
+        <a href="#download" class="btn btn-ghost">Активировать ключ</a>
+    </div>
+
+    <div class="scroll-hint motion-target">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+    </div>
+</header>
+
+<section class="section reveal">
+    <div class="section-label">// Почему мы</div>
+    <h2 class="section-title">Качество, которое <span class="grad">видно</span></h2>
+    <p class="section-desc">Мы делаем визуалы, которые не мешают играть. Только эстетика и комфорт в каждой детали.</p>
+
+    <div class="features">
+        <div class="feature motion-target">
+            <span class="feature-icon">⚡</span>
+            <h3>Оптимизация</h3>
+            <p>Максимум качества при минимальном влиянии на FPS. Плавно на любом железе.</p>
+        </div>
+        <div class="feature motion-target">
+            <span class="feature-icon">🎨</span>
+            <h3>Уникальный стиль</h3>
+            <p>Каждый визуал проработан вручную. Никаких шаблонов и копий.</p>
+        </div>
+        <div class="feature motion-target">
+            <span class="feature-icon">🚀</span>
+            <h3>Актуально 1.21.8</h3>
+            <p>Обновляемся под последние версии Minecraft. Всё работает из коробки.</p>
+        </div>
+        <div class="feature motion-target">
+            <span class="feature-icon">💬</span>
+            <h3>Поддержка 24/7</h3>
+            <p>Поможем с установкой и ответим на любые вопросы в Telegram.</p>
+        </div>
+    </div>
+</section>
+
+<section class="devices-section reveal" id="devices">
+    <div class="section-label">// Совместимость</div>
+    <h2 class="section-title">Поддерживаемые <span class="grad">устройства</span></h2>
+    <p class="section-desc">Наши визуалы протестированы и стабильно работают на следующих платформах.</p>
+
+    <div class="devices-grid">
+        <div class="device-card motion-target">
+            <span class="device-card-icon">🖥️</span>
+            <div class="device-card-content">
+                <div class="device-card-title">ПК · Windows</div>
+                <div class="device-card-desc">Стационарные компьютеры на Windows. Максимальная производительность и все эффекты.</div>
+                <span class="device-card-badge">WIN 10 / 11</span>
+            </div>
+        </div>
+
+        <div class="device-card motion-target">
+            <span class="device-card-icon">💻</span>
+            <div class="device-card-content">
+                <div class="device-card-title">Ноутбуки</div>
+                <div class="device-card-desc">Портативные устройства на Windows. Оптимизировано под любые конфигурации.</div>
+                <span class="device-card-badge">WIN 10 / 11</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="promo-section reveal">
+    <div class="promo-box motion-target">
+        <div>
+            <h3>🎁 Промокод</h3>
+            <p>Введи код и получи реальную скидку на заказ</p>
+        </div>
+        <div class="promo-input-wrap">
+            <input type="text" class="promo-input" id="promoInput" placeholder="Введи промокод..." maxlength="20">
+            <button class="promo-btn" onclick="applyPromo()">Применить</button>
+        </div>
+        <div class="promo-message" id="promoMessage"></div>
+    </div>
+</section>
+
+<section class="section reveal" id="products">
+    <div class="section-label">// Каталог</div>
+    <h2 class="section-title">Наши <span class="grad">визуалы</span></h2>
+    <p class="section-desc">Три уровня — от базового до легендарного. Каждый проработан до мелочей.</p>
+
+    <div class="products">
+
+        <div class="product motion-target" style="--glow: rgba(255, 85, 85, 0.15); --glow-border: rgba(255, 85, 85, 0.4); --crystal-color: #ff5555;">
+            <span class="product-tag tag-def">STANDARD</span>
+            <div class="crystal-wrap small">
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <svg class="crystal" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="crystalRed1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffaaaa"/>
+                            <stop offset="40%" stop-color="#ff5555"/>
+                            <stop offset="100%" stop-color="#880000"/>
+                        </linearGradient>
+                        <linearGradient id="crystalRed2" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ff5555"/>
+                            <stop offset="100%" stop-color="#4a0000"/>
+                        </linearGradient>
+                        <linearGradient id="crystalRed3" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#cc2222"/>
+                            <stop offset="100%" stop-color="#ffcccc"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M50 5 L75 35 L70 80 L50 95 L30 80 L25 35 Z" fill="url(#crystalRed1)" stroke="#ff5555" stroke-width="1" opacity="0.9"/>
+                    <path d="M50 5 L25 35 L30 80 L50 95 Z" fill="url(#crystalRed3)" opacity="0.7"/>
+                    <path d="M50 5 L75 35 L70 80 L50 95 Z" fill="url(#crystalRed2)" opacity="0.8"/>
+                    <path d="M50 5 L45 30 L50 50 L55 30 Z" fill="#ffffff" opacity="0.5"/>
+                    <circle cx="42" cy="25" r="2" fill="#fff" opacity="0.9"/>
+                    <circle cx="58" cy="45" r="1.5" fill="#fff" opacity="0.7"/>
+                </svg>
+            </div>
+            <div class="product-name">// TIER 1</div>
+            <h3>W СТАНДАРТ</h3>
+            <p class="product-desc">Базовый визуал. Чисто, минималистично, эстетично. Идеально для повседневной игры.</p>
+            <div class="product-footer">
+                <div class="price" style="color: #ff5555;" data-price="199">
+                    <span class="price-current">199</span><small>₽</small>
+                </div>
+                <button class="buy" onclick="addToCart('w-standard', 'W СТАНДАРТ', 199, 'green')">В корзину</button>
+            </div>
+        </div>
+
+        <div class="product motion-target" style="--glow: rgba(255, 204, 51, 0.15); --glow-border: rgba(255, 204, 51, 0.4); --crystal-color: #ffcc33;">
+            <span class="product-tag tag-top">EXTENDED</span>
+            <div class="crystal-wrap small">
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <svg class="crystal" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="crystalGold1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffee88"/>
+                            <stop offset="40%" stop-color="#ffcc33"/>
+                            <stop offset="100%" stop-color="#aa7700"/>
+                        </linearGradient>
+                        <linearGradient id="crystalGold2" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffcc33"/>
+                            <stop offset="100%" stop-color="#664400"/>
+                        </linearGradient>
+                        <linearGradient id="crystalGold3" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#ffdd55"/>
+                            <stop offset="100%" stop-color="#ffee99"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M50 5 L75 35 L70 80 L50 95 L30 80 L25 35 Z" fill="url(#crystalGold1)" stroke="#ffcc33" stroke-width="1" opacity="0.9"/>
+                    <path d="M50 5 L25 35 L30 80 L50 95 Z" fill="url(#crystalGold3)" opacity="0.7"/>
+                    <path d="M50 5 L75 35 L70 80 L50 95 Z" fill="url(#crystalGold2)" opacity="0.8"/>
+                    <path d="M50 5 L45 30 L50 50 L55 30 Z" fill="#ffffff" opacity="0.55"/>
+                    <circle cx="42" cy="25" r="2" fill="#fff" opacity="0.9"/>
+                    <circle cx="58" cy="45" r="1.5" fill="#fff" opacity="0.7"/>
+                </svg>
+            </div>
+            <div class="product-name">// TIER 2</div>
+            <h3>W РАСШИРЕННЫЙ</h3>
+            <p class="product-desc">Прокачанный визуал. Больше деталей, больше глубины, больше атмосферы в каждом кадре.</p>
+            <div class="product-footer">
+                <div class="price" style="color: var(--gold);" data-price="399">
+                    <span class="price-current">399</span><small>₽</small>
+                </div>
+                <button class="buy" onclick="addToCart('w-extended', 'W РАСШИРЕННЫЙ', 399, 'gold')">В корзину</button>
+            </div>
+        </div>
+
+        <div class="product premium motion-target" style="--crystal-color: #ffcc33;">
+            <span class="premium-crown">👑 LEGENDARY</span>
+            <span class="product-tag tag-plus">EDU</span>
+            <div class="crystal-wrap large">
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <span class="crystal-spark"></span>
+                <svg class="crystal" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="crystalPrem1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="30%" stop-color="#ffdd55"/>
+                            <stop offset="60%" stop-color="#ffaa00"/>
+                            <stop offset="100%" stop-color="#aa6600"/>
+                        </linearGradient>
+                        <linearGradient id="crystalPrem2" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffcc33"/>
+                            <stop offset="50%" stop-color="#ff8844"/>
+                            <stop offset="100%" stop-color="#662200"/>
+                        </linearGradient>
+                        <linearGradient id="crystalPrem3" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#ffaa00"/>
+                            <stop offset="50%" stop-color="#ffee88"/>
+                            <stop offset="100%" stop-color="#ffffff"/>
+                        </linearGradient>
+                        <radialGradient id="crystalPremCore" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                            <stop offset="100%" stop-color="#ffcc33" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <path d="M50 3 L78 33 L72 82 L50 97 L28 82 L22 33 Z" fill="url(#crystalPrem1)" stroke="#ffcc33" stroke-width="1.2" opacity="0.95"/>
+                    <path d="M50 3 L22 33 L28 82 L50 97 Z" fill="url(#crystalPrem3)" opacity="0.75"/>
+                    <path d="M50 3 L78 33 L72 82 L50 97 Z" fill="url(#crystalPrem2)" opacity="0.85"/>
+                    <path d="M50 20 L65 40 L62 72 L50 82 L38 72 L35 40 Z" fill="url(#crystalPremCore)" opacity="0.9"/>
+                    <circle cx="50" cy="50" r="6" fill="#fff" opacity="0.95"/>
+                    <circle cx="50" cy="50" r="3" fill="#fff"/>
+                    <path d="M50 3 L44 30 L50 55 L56 30 Z" fill="#ffffff" opacity="0.6"/>
+                    <circle cx="40" cy="22" r="2.5" fill="#fff" opacity="1"/>
+                    <circle cx="62" cy="42" r="2" fill="#fff" opacity="0.8"/>
+                    <circle cx="38" cy="60" r="1.5" fill="#fff" opacity="0.7"/>
+                </svg>
+            </div>
+            <div class="product-name">// TIER 3 · LEGENDARY</div>
+            <h3>W PRO EDUCATION</h3>
+            <p class="product-desc">Легендарный визуал премиум-класса. Максимум эффектов, частиц и шейдеров. Обучающие материалы в комплекте.</p>
+            <div class="product-footer">
+                <div class="price" style="color: var(--gold);" data-price="599">
+                    <span class="price-current">599</span><small>₽</small>
+                </div>
+                <button class="buy" onclick="addToCart('w-pro-edu', 'W PRO EDUCATION', 599, 'gold')">В корзину</button>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="download-section reveal" id="download">
+    <div class="download-box motion-target">
+        <div class="download-header">
+            <h3>🔑 Активация ключа</h3>
+            <p>Введи ключ, который ты получил после оплаты в Telegram — откроется доступ к скачиванию</p>
+        </div>
+
+        <div id="keyFormBlock">
+            <div class="key-form">
+                <input type="text" class="key-input" id="keyInput" placeholder="WERKA-XXXX-XXXX" maxlength="20">
+                <button class="key-btn" onclick="activateKey()">Активировать</button>
+            </div>
+            <div class="key-message" id="keyMessage"></div>
+        </div>
+
+        <div class="access-block" id="accessBlock">
+            <div class="access-badge">✓ Доступ открыт</div>
+
+            <div class="access-grid">
+                <div class="access-col">
+                    <h4>📖 Инструкция по установке</h4>
+                    <ol>
+                        <li>Скачай архив по кнопке ниже</li>
+                        <li>Распакуй его любым архиватором (<strong>WinRAR</strong> или <strong>7-Zip</strong>)</li>
+                        <li>Введи пароль от архива (он указан ниже)</li>
+                        <li>Открой папку <code>.minecraft</code> — нажми <strong>Win+R</strong> и введи <code>%appdata%</code></li>
+                        <li>Скопируй папки <code>resourcepacks</code> и <code>shaderpacks</code> в <code>.minecraft</code></li>
+                        <li>Запусти Minecraft → <strong>Настройки → Наборы ресурсов</strong> → активируй визуалы</li>
+                        <li>Готово! Наслаждайся ✨</li>
+                    </ol>
+                </div>
+
+                <div class="access-col">
+                    <h4>💾 Файл визуалов</h4>
+                    <div class="password-box">
+                        <span class="password-box-label">Пароль</span>
+                        <span class="password-box-value" id="archivePassword">werka_2026</span>
+                        <button class="password-copy" onclick="copyPassword()">Скопировать</button>
+                    </div>
+
+                    <div class="download-actions">
+                        <a href="#" class="download-big-btn" onclick="handleDownload(event)">
+                            ⬇️ Скачать визуалы
+                        </a>
+                    </div>
+
+                    <div class="download-actions" style="margin-top: 0.6rem;">
+                        <a href="https://t.me/werised" target="_blank" class="download-alt-btn" style="width:100%">
+                            ✈️ Поддержка — @werised
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="access-note">
+                <strong>⚠️ Важно:</strong> не передавай ключ третьим лицам. Если возникнут проблемы с установкой — напиши в Telegram <strong>@werised</strong>.
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="media-section reveal" id="media">
+    <div class="media-hero motion-target">
+        <div class="media-badge">
+            <span class="dot" style="background: #ff8888; box-shadow: 0 0 10px #ff8888;"></span>
+            Media Program
+        </div>
+        <h2 class="media-title">Стань медиа<br>werka.project</h2>
+        <p class="media-desc">
+            Снимай ролики, показывай визуалы своей аудитории и получай деньги за каждый просмотр и продажу. 
+            Работаем с TikTok, YouTube, Twitch и Shorts.
+        </p>
+
+        <div class="media-stats">
+            <div class="media-stat">
+                <span class="media-stat-num">до 40%</span>
+                <span class="media-stat-label">С продажи</span>
+            </div>
+            <div class="media-stat">
+                <span class="media-stat-num">₽10k+</span>
+                <span class="media-stat-label">В месяц</span>
+            </div>
+            <div class="media-stat">
+                <span class="media-stat-num">24/7</span>
+                <span class="media-stat-label">Выплаты</span>
+            </div>
+        </div>
+
+        <button class="media-cta" onclick="openApply('media')">
+            🎬 Подать заявку на медиа
+        </button>
+    </div>
+
+    <div class="media-features">
+        <div class="media-feature motion-target">
+            <span class="media-feature-icon">🎬</span>
+            <h4>Снимай ролики</h4>
+            <p>Получай доступ к эксклюзивным визуалам для съёмок контента раньше всех.</p>
+        </div>
+        <div class="media-feature motion-target">
+            <span class="media-feature-icon">💸</span>
+            <h4>Зарабатывай</h4>
+            <p>Процент с каждой продажи по твоей ссылке. Чем больше охват — тем больше доход.</p>
+        </div>
+        <div class="media-feature motion-target">
+            <span class="media-feature-icon">🏆</span>
+            <h4>Бонусы</h4>
+            <p>Эксклюзивные награды и повышенные проценты за активность и стабильность.</p>
+        </div>
+        <div class="media-feature motion-target">
+            <span class="media-feature-icon">🚀</span>
+            <h4>Продвижение</h4>
+            <p>Репосты твоего контента с наших соцсетей. Растём вместе.</p>
+        </div>
+    </div>
+</section>
+
+<section class="partner reveal" id="partner">
+    <div class="partner-card motion-target">
+        <span class="partner-icon">🤝</span>
+        <h2 class="partner-title">Партнёрская программа</h2>
+        <p class="partner-desc">
+            Хочешь зарабатывать вместе с werka.project? Приводи клиентов, получай процент с каждой продажи. 
+            Все условия обсуждаем индивидуально.
+        </p>
+        <div class="partner-perks">
+            <span class="perk">💸 До 30% с продажи</span>
+            <span class="perk">⚡ Быстрые выплаты</span>
+            <span class="perk">🎁 Бонусы за активность</span>
+        </div>
+        <button class="tg-btn" onclick="openApply('partner')">
+            ✈️ Подать заявку на партнёрку
+        </button>
+    </div>
+</section>
+
+<section class="creator" id="creator">
+    <div class="creator-label">// Создатель</div>
+    <div class="creator-name motion-target">werka.project</div>
+    <p class="motion-target">Проект создан с душой для комьюнити Minecraft. Сайт разработан <strong>werised</strong>.</p>
+</section>
+
+<footer>
+    © 28.09.2026 <span>werka.project</span> // developed by werised
+</footer>
+
+<div class="admin-modal" id="adminModal">
+    <div class="admin-window">
+        <button class="admin-close" onclick="closeAdmin()">✕</button>
+
+        <div class="admin-header">
+            <span class="admin-header-icon">🛡️</span>
+            <h2 class="admin-title">ADMIN PANEL</h2>
+            <p class="admin-subtitle">// ROOT ACCESS</p>
+        </div>
+
+        <div class="admin-stats">
+            <div class="admin-stat">
+                <span class="admin-stat-num" id="adminUsersCount">0</span>
+                <span class="admin-stat-label">Юзеров</span>
+            </div>
+            <div class="admin-stat">
+                <span class="admin-stat-num" id="adminAppsCount">0</span>
+                <span class="admin-stat-label">Заявок</span>
+            </div>
+        </div>
+
+        <div class="admin-actions">
+            <button class="admin-action blue" onclick="adminViewAllUsers()">
+                <span class="admin-action-icon">👥</span>
+                <div class="admin-action-info">
+                    <div class="admin-action-title">Список пользователей</div>
+                    <div class="admin-action-desc">Показать всех зарегистрированных в консоли</div>
+                </div>
+            </button>
+
+            <button class="admin-action blue" onclick="adminViewAllApps()">
+                <span class="admin-action-icon">📋</span>
+                <div class="admin-action-info">
+                    <div class="admin-action-title">Список заявок</div>
+                    <div class="admin-action-desc">Показать все заявки на медиа и партнёрку</div>
+                </div>
+            </button>
+
+            <button class="admin-action warn" onclick="adminResetKeys()">
+                <span class="admin-action-icon">🔑</span>
+                <div class="admin-action-info">
+                    <div class="admin-action-title">Сбросить ключи</div>
+                    <div class="admin-action-desc">Освободить все использованные ключи активации</div>
+                </div>
+            </button>
+        </div>
+
+        <div class="admin-danger-zone">
+            <h4>⚠ DANGER ZONE ⚠</h4>
+            <button class="admin-action danger" onclick="adminConfirmResetAll()">
+                <span class="admin-action-icon">💥</span>
+                <div class="admin-action-info">
+                    <div class="admin-action-title">ПОЛНЫЙ СБРОС БД</div>
+                    <div class="admin-action-desc">Удалить всех юзеров, заявки, корзину и активации. Всё станет как новое.</div>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="confirm-modal" id="confirmModal">
+    <div class="confirm-window">
+        <span class="confirm-icon">⚠️</span>
+        <h3 class="confirm-title">Точно сбросить?</h3>
+        <p class="confirm-text" id="confirmText">Это действие удалит ВСЕ данные без возможности восстановления.</p>
+        <div class="confirm-actions">
+            <button class="confirm-btn cancel" onclick="closeConfirm()">Отмена</button>
+            <button class="confirm-btn danger" id="confirmBtn" onclick="executeConfirm()">Да, сбросить</button>
+        </div>
+    </div>
+</div>
+
+<div class="auth-modal" id="authModal">
+    <div class="auth-window">
+        <button class="auth-close" onclick="closeAuth()">✕</button>
+        <div class="auth-header">
+            <h2 class="auth-title" id="authTitle">С возвращением</h2>
+            <p class="auth-subtitle" id="authSubtitle">Войди в аккаунт, чтобы продолжить</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Вход</button>
+            <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Регистрация</button>
+        </div>
+
+        <form class="auth-form" onsubmit="handleAuth(event)">
+            <div class="auth-field" id="nicknameField" style="display:none;">
+                <label for="authNickname">Никнейм</label>
+                <input type="text" id="authNickname" placeholder="werka_user" maxlength="20" autocomplete="username">
+            </div>
+
+            <div class="auth-field">
+                <label for="authEmail">Email</label>
+                <input type="email" id="authEmail" placeholder="you@example.com" required autocomplete="email">
+            </div>
+
+            <div class="auth-field">
+                <label for="authPassword">Пароль</label>
+                <input type="password" id="authPassword" placeholder="Минимум 6 символов" required minlength="1" autocomplete="current-password">
+            </div>
+
+            <div class="auth-error" id="authError"></div>
+
+            <button type="submit" class="auth-submit" id="authSubmitBtn">Войти</button>
+        </form>
+
+        <p class="auth-hint">
+            Регистрируясь, ты соглашаешься с правилами проекта.<br>
+            Аккаунт сохраняется в браузере и работает без сервера.
+        </p>
+    </div>
+</div>
+
+<div class="apply-modal" id="applyModal">
+    <div class="apply-window">
+        <button class="apply-close" onclick="closeApply()">✕</button>
+
+        <div class="apply-header">
+            <span class="apply-icon" id="applyIcon">🎬</span>
+            <h2 class="apply-title" id="applyTitle">Заявка на медиа</h2>
+            <p class="apply-subtitle" id="applySubtitle">Заполни форму — отвечу в Telegram в течение 24 часов</p>
+        </div>
+
+        <form class="apply-form" onsubmit="handleApply(event)">
+            <div class="apply-field">
+                <label for="applyNickname">Ник на сайте</label>
+                <input type="text" id="applyNickname" placeholder="Как тебя звать на сайте?" required maxlength="30">
+            </div>
+
+            <div class="apply-field">
+                <label for="applyChannel">Ссылка на канал</label>
+                <input type="url" id="applyChannel" placeholder="https://tiktok.com/@..." required>
+            </div>
+
+            <div class="apply-field" id="videoUploadField">
+                <label>Ролик (загрузи файл)</label>
+                <div class="file-upload">
+                    <input type="file" id="applyVideo" accept="video/*">
+                    <div class="file-upload-label" id="fileUploadLabel">
+                        <span class="file-icon">📤</span>
+                        <span class="file-text">Нажми, чтобы загрузить ролик</span>
+                        <span class="file-hint">MP4, MOV · до 100 МБ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="apply-field">
+                <label for="applyContact">Контакт (Telegram / Email)</label>
+                <input type="text" id="applyContact" placeholder="@username или email" required maxlength="60">
+            </div>
+
+            <div class="apply-field">
+                <label for="applyComment">Комментарий (необязательно)</label>
+                <textarea id="applyComment" placeholder="Расскажи о себе, аудитории, опыте..." maxlength="500"></textarea>
+            </div>
+
+            <div class="apply-error" id="applyError"></div>
+
+            <button type="submit" class="apply-submit">Отправить заявку</button>
+        </form>
+
+        <p class="apply-hint" id="applyHint">
+            Заявка сохранится локально. После отправки свяжись со мной в Telegram — <b>@werised</b>
+        </p>
+    </div>
+</div>
+
+<div class="profile-modal" id="profileModal">
+    <div class="profile-window">
+        <button class="profile-close" onclick="closeProfile()">✕</button>
+        <div class="profile-header">
+            <div class="profile-avatar-big" id="profileAvatarBig">W</div>
+            <div class="profile-nickname" id="profileNickname">user</div>
+            <div class="profile-email" id="profileEmail">user@example.com</div>
+        </div>
+
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <span class="profile-stat-num" id="profileOrders">0</span>
+                <span class="profile-stat-label">Заказов</span>
+            </div>
+            <div class="profile-stat">
+                <span class="profile-stat-num" id="profileApps">0</span>
+                <span class="profile-stat-label">Заявок</span>
+            </div>
+        </div>
+
+        <button class="profile-logout" onclick="logout()">Выйти из аккаунта</button>
+    </div>
+</div>
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cartPanel">
+    <div class="cart-header">
+        <h3>🛒 Корзина</h3>
+        <button class="cart-close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <div class="cart-empty">Корзина пуста</div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+        <div class="cart-promo-applied" id="cartPromoApplied" style="display:none;">
+            <span>Промокод <b id="cartPromoCode"></b></span>
+            <span id="cartPromoDiscount"></span>
+        </div>
+        <div class="cart-discount" id="cartDiscount" style="display:none;">
+            <span>Скидка</span>
+            <span id="cartDiscountValue"></span>
+        </div>
+        <div class="cart-total">
+            <span class="cart-total-label">Итого:</span>
+            <span class="cart-total-price" id="cartTotal">0₽</span>
+        </div>
+        <button class="checkout-btn" onclick="checkout()">Оформить заказ</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="auth-modal" id="orderModal" style="z-index: 500;">
+    <div class="auth-window" style="max-width: 480px; text-align: center;">
+        <button class="auth-close" onclick="closeOrderModal()">✕</button>
+
+        <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+        <h2 class="auth-title" style="margin-bottom: 0.6rem;">Заказ оформлен!</h2>
+        <p style="color: #b09090; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">
+            Оплати заказ в Telegram — после оплаты я выдам тебе <b style="color: #fff;">ключ активации</b>. 
+            Ключ вводится в разделе «Скачать» на сайте.
+        </p>
+
+        <div style="background: rgba(255, 85, 85, 0.08); border: 1px solid rgba(255, 85, 85, 0.3); border-radius: 14px; padding: 1rem; margin-bottom: 1.5rem;">
+            <div style="font-size: 0.7rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.4rem;">Сумма заказа</div>
+            <div style="font-family: 'Unbounded', sans-serif; font-size: 1.6rem; font-weight: 900; background: linear-gradient(135deg, #ff5555, #ffaa33); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="orderModalTotal">0₽</div>
+        </div>
+
+        <a href="https://t.me/werised" target="_blank" class="tg-btn" style="width: 100%; justify-content: center;">
+            ✈️ Написать @werised
+        </a>
+
+        <p style="font-size: 0.72rem; color: var(--muted); margin-top: 1rem; line-height: 1.5;">
+            После получения ключа — введи его в разделе <b>«Скачать»</b> на сайте.<br>
+            Пока автовыдача в разработке — ключ выдаётся вручную.
+        </p>
+    </div>
+</div>
+
+<div class="semka-overlay" id="semkaOverlay">
+    <div class="semka-flash"></div>
+    <div class="semka-scene">
+        <div class="semka-wave"></div>
+        <div class="semka-wave"></div>
+        <div class="semka-wave"></div>
+        <div class="semka-lens"></div>
+        <div class="semka-accretion"></div>
+        <div class="semka-accretion-thin"></div>
+        <div class="semka-chain semka-chain-1"><div class="semka-chain-orbit"><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div></div></div>
+        <div class="semka-chain semka-chain-2"><div class="semka-chain-orbit"><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div></div></div>
+        <div class="semka-chain semka-chain-3"><div class="semka-chain-orbit"><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div></div></div>
+        <div class="semka-chain semka-chain-4"><div class="semka-chain-orbit"><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div><div class="semka-link"></div></div></div>
+        <div class="semka-horizon"></div>
+        <div class="semka-hole"></div>
+        <div class="semka-nick">SEMKA</div>
+    </div>
+</div>
+
+<script>
+/* ================================================================
+   MC-НЕБО — квадратное солнце + звёзды + плавное вращение купола
+   ================================================================ */
+(function() {
+    var canvas = document.getElementById('mcCanvas');
+    if (!canvas) return;
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        canvas.style.display = 'none';
+        return;
+    }
+
+    var ctx = canvas.getContext('2d', { alpha: true });
+    var w, h, dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var stars = [];
+    var running = true;
+
+    /* Очень плавное вращение неба — угол в радианах */
+    var skyAngle = 0;
+    var SKY_SPEED = 0.00008; // очень медленно, чтобы было "плавнейше"
+
+    /* Небесный диск: воображаемая сфера, по которой плывут звёзды */
+    var SPHERE_RADIUS = 1.0; // нормализованный радиус
+
+    function resize() {
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initStars();
+    }
+
+    function initStars() {
+        var count = Math.floor(w * h / 9000);
+        if (count > 550) count = 550;
+        if (count < 120) count = 120;
+        stars = [];
+        for (var i = 0; i < count; i++) {
+            /* Распределяем звёзды по сфере через сферические координаты */
+            var theta = Math.random() * Math.PI * 2;         // долгота
+            var phi = Math.acos(2 * Math.random() - 1);      // широта (0..PI)
+
+            /* Разные цвета звёзд — белые, розовые, голубые */
+            var rand = Math.random();
+            var color;
+            if (rand < 0.6) color = [255, 255, 255];
+            else if (rand < 0.75) color = [255, 220, 220];
+            else if (rand < 0.85) color = [220, 220, 255];
+            else if (rand < 0.92) color = [255, 200, 220];
+            else if (rand < 0.97) color = [200, 230, 255];
+            else color = [255, 240, 200];
+
+            stars.push({
+                theta: theta,
+                phi: phi,
+                r: Math.random() * 1.3 + 0.3,
+                baseA: Math.random() * 0.5 + 0.4,
+                phase: Math.random() * Math.PI * 2,
+                speed: Math.random() * 0.012 + 0.004,
+                color: color
+            });
+        }
+    }
+
+    resize();
+
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resize, 200);
+    });
+
+    /* Квадратное солнце с ядром и внешним свечением — как в MC */
+    function drawSun(cx, cy) {
+        var baseSize = Math.min(w, h) * 0.085;
+
+        /* Внешнее амбер-свечение */
+        var outerGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseSize * 4.5);
+        outerGlow.addColorStop(0, 'rgba(255, 220, 130, 0.55)');
+        outerGlow.addColorStop(0.25, 'rgba(255, 180, 60, 0.35)');
+        outerGlow.addColorStop(0.55, 'rgba(255, 120, 30, 0.15)');
+        outerGlow.addColorStop(1, 'rgba(255, 80, 0, 0)');
+        ctx.fillStyle = outerGlow;
+        ctx.fillRect(cx - baseSize * 5, cy - baseSize * 5, baseSize * 10, baseSize * 10);
+
+        /* Промежуточный слой — квадрат с размытием */
+        var midSize = baseSize * 1.5;
+        var midGrad = ctx.createRadialGradient(cx, cy, baseSize * 0.4, cx, cy, midSize * 1.6);
+        midGrad.addColorStop(0, 'rgba(255, 245, 200, 0.9)');
+        midGrad.addColorStop(0.6, 'rgba(255, 210, 100, 0.55)');
+        midGrad.addColorStop(1, 'rgba(255, 180, 60, 0)');
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(Math.PI / 4 * 0); /* без поворота — квадрат ровно */
+
+        /* Внешний квадрат (жёлтый контур) */
+        var outerSize = baseSize * 1.35;
+        var outerGrad = ctx.createLinearGradient(-outerSize, -outerSize, outerSize, outerSize);
+        outerGrad.addColorStop(0, '#ffe680');
+        outerGrad.addColorStop(0.5, '#ffcc33');
+        outerGrad.addColorStop(1, '#ffaa00');
+        ctx.fillStyle = outerGrad;
+        ctx.shadowColor = 'rgba(255, 200, 80, 0.95)';
+        ctx.shadowBlur = baseSize * 0.9;
+        ctx.fillRect(-outerSize / 2, -outerSize / 2, outerSize, outerSize);
+
+        /* Средний квадрат (светло-жёлтый) */
+        var midSize2 = baseSize * 1.0;
+        var midGrad2 = ctx.createLinearGradient(-midSize2, -midSize2, midSize2, midSize2);
+        midGrad2.addColorStop(0, '#fff5cc');
+        midGrad2.addColorStop(0.5, '#ffee88');
+        midGrad2.addColorStop(1, '#ffdd55');
+        ctx.fillStyle = midGrad2;
+        ctx.fillRect(-midSize2 / 2, -midSize2 / 2, midSize2, midSize2);
+
+        /* Внутреннее ядро — почти белое, светящееся */
+        var coreSize = baseSize * 0.65;
+        var coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, coreSize);
+        coreGrad.addColorStop(0, '#ffffff');
+        coreGrad.addColorStop(0.6, '#fffbe0');
+        coreGrad.addColorStop(1, '#ffee99');
+        ctx.fillStyle = coreGrad;
+        ctx.shadowColor = 'rgba(255, 255, 220, 1)';
+        ctx.shadowBlur = baseSize * 0.6;
+        ctx.fillRect(-coreSize / 2, -coreSize / 2, coreSize, coreSize);
+
+        ctx.restore();
+    }
+
+    /* Рисуем звёзды с учётом вращения купола */
+    function drawStars(now, angle) {
+        var cx = w / 2;
+        var cy = h * 0.42; /* центр небесной сферы — чуть выше середины */
+        var R = Math.max(w, h) * 0.85; /* радиус сферы, чуть больше экрана */
+
+        var cosA = Math.cos(angle);
+        var sinA = Math.sin(angle);
+
+        for (var i = 0; i < stars.length; i++) {
+            var s = stars[i];
+
+            /* 3D-координаты звезды на сфере */
+            var x3 = Math.sin(s.phi) * Math.cos(s.theta);
+            var y3 = Math.cos(s.phi);
+            var z3 = Math.sin(s.phi) * Math.sin(s.theta);
+
+            /* Вращение вокруг вертикальной оси (Y) — небо "плывёт" */
+            var rx = x3 * cosA - z3 * sinA;
+            var rz = x3 * sinA + z3 * cosA;
+            var ry = y3;
+
+            /* Небольшой наклон оси вращения, чтобы купол выглядел объёмно */
+            var tilt = 0.35;
+            var ty = ry * Math.cos(tilt) - rz * Math.sin(tilt);
+            var tz = ry * Math.sin(tilt) + rz * Math.cos(tilt);
+
+            /* Проекция на плоскость экрана */
+            var px = cx + rx * R;
+            var py = cy + ty * R;
+
+            /* Видимость: только передняя полусфера (tz > -0.2) */
+            if (tz < -0.2) continue;
+
+            /* Прозрачность зависит от "глубины" — звёзды сзади тусклее */
+            var depth = (tz + 1) / 2; /* 0..1 */
+            var alpha = s.baseA * (0.5 + depth * 0.5);
+
+            /* Мерцание */
+            var flicker = (Math.sin(now * s.speed + s.phase) + 1) * 0.5;
+            alpha *= (0.65 + flicker * 0.35);
+
+            if (alpha < 0.05) continue;
+            if (px < -20 || px > w + 20 || py < -20 || py > h + 20) continue;
+
+            ctx.fillStyle = 'rgba(' + s.color[0] + ',' + s.color[1] + ',' + s.color[2] + ',' + alpha + ')';
+            ctx.beginPath();
+            ctx.arc(px, py, s.r, 0, Math.PI * 2);
+            ctx.fill();
+
+            /* Крупные звёзды получают мягкое свечение */
+            if (s.r > 1.0) {
+                var g = ctx.createRadialGradient(px, py, 0, px, py, s.r * 5);
+                g.addColorStop(0, 'rgba(' + s.color[0] + ',' + s.color[1] + ',' + s.color[2] + ',' + (alpha * 0.35) + ')');
+                g.addColorStop(1, 'rgba(' + s.color[0] + ',' + s.color[1] + ',' + s.color[2] + ',0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(px, py, s.r * 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+
+    var lastTime = performance.now();
+    var accumulated = 0;
+
+    function draw(now) {
+        if (!running) return;
+
+        var dt = now - lastTime;
+        lastTime = now;
+        /* Ограничиваем шаг, чтобы не было рывков при возврате на вкладку */
+        if (dt > 100) dt = 100;
+
+        ctx.clearRect(0, 0, w, h);
+
+        /* Плавное накопление угла — можно замедлить/ускорить одним числом */
+        accumulated += dt * SKY_SPEED;
+        skyAngle = accumulated;
+
+        /* Звёзды */
+        drawStars(now, skyAngle);
+
+        /* Солнце — рисуем поверх звёзд (оно всегда ближе) */
+        var sunCx = w / 2 + Math.sin(skyAngle * 0.6) * w * 0.03;
+        var sunCy = h * 0.42 + Math.cos(skyAngle * 0.4) * h * 0.02;
+        drawSun(sunCx, sunCy);
+
+        requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            running = false;
+        } else if (!running) {
+            running = true;
+            lastTime = performance.now();
+            requestAnimationFrame(draw);
+        }
+    });
+})();
+
+/* ================================================================
+   БЕЗОПАСНАЯ ОБЁРТКА
+   ================================================================ */
+var _memStorage = {};
+var SafeStorage = {
+    getItem: function(key) {
+        try { return localStorage.getItem(key); }
+        catch(e) { return _memStorage[key] !== undefined ? _memStorage[key] : null; }
+    },
+    setItem: function(key, value) {
+        try { localStorage.setItem(key, value); }
+        catch(e) { _memStorage[key] = String(value); }
+    },
+    removeItem: function(key) {
+        try { localStorage.removeItem(key); }
+        catch(e) { delete _memStorage[key]; }
+    },
+    clear: function() {
+        try { localStorage.clear(); }
+        catch(e) { _memStorage = {}; }
+    }
+};
+
+/* ================================================================
+   ADMIN
+   ================================================================ */
+var ADMIN_NICKNAME = 'ADMIN';
+var ADMIN_PASSWORD = '1';
+
+function isCurrentUserAdmin() {
+    var user = getCurrentUser();
+    if (!user) return false;
+    return user.nickname === ADMIN_NICKNAME;
+}
+
+function renderAdminSlot() {
+    var slot = document.getElementById('adminSlot');
+    if (!slot) return;
+    if (isCurrentUserAdmin()) {
+        slot.innerHTML = '<button class="admin-btn" onclick="openAdmin()">🛡️ ADMIN</button>';
+    } else {
+        slot.innerHTML = '';
+    }
+}
+
+function openAdmin() {
+    if (!isCurrentUserAdmin()) { showToast('Доступ запрещён'); SoundKit.error(); return; }
+    updateAdminStats();
+    document.getElementById('adminModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    SoundKit.open();
+}
+
+function closeAdmin() {
+    document.getElementById('adminModal').classList.remove('open');
+    document.body.style.overflow = '';
+    SoundKit.close();
+}
+
+function updateAdminStats() {
+    document.getElementById('adminUsersCount').textContent = loadUsers().length;
+    document.getElementById('adminAppsCount').textContent = loadApps().length;
+}
+
+function adminViewAllUsers() {
+    var users = loadUsers();
+    console.log('%c=== СПИСОК ПОЛЬЗОВАТЕЛЕЙ ===', 'color: #ff5555; font-size: 14px; font-weight: bold;');
+    console.log('Всего:', users.length);
+    users.forEach(function(u, i) { console.log((i+1) + '.', u.nickname, '|', u.email, '| заказов:', u.orders || 0, '| заявок:', u.apps || 0); });
+    showToast('Список в консоли (F12)');
+    SoundKit.success();
+}
+
+function adminViewAllApps() {
+    var apps = loadApps();
+    console.log('%c=== СПИСОК ЗАЯВОК ===', 'color: #ff8888; font-size: 14px; font-weight: bold;');
+    console.log('Всего:', apps.length);
+    apps.forEach(function(a, i) { console.log((i+1) + '.', '[' + a.type + ']', a.nickname, '|', a.contact, '| канал:', a.channel); });
+    showToast('Список в консоли (F12)');
+    SoundKit.success();
+}
+
+function adminResetKeys() {
+    SafeStorage.removeItem('werka_activated');
+    showToast('Ключи активации сброшены');
+    SoundKit.success();
+}
+
+var confirmAction = null;
+
+function adminConfirmResetAll() {
+    confirmAction = 'reset_all';
+    document.getElementById('confirmText').textContent = 'Это удалит ВСЕХ пользователей, ВСЕ заявки, корзину и активации ключей. Сайт станет абсолютно чистым. Продолжить?';
+    document.getElementById('confirmModal').classList.add('open');
+    SoundKit.error();
+}
+
+function closeConfirm() {
+    document.getElementById('confirmModal').classList.remove('open');
+    confirmAction = null;
+}
+
+function executeConfirm() {
+    if (confirmAction === 'reset_all') {
+        SafeStorage.clear();
+        _memStorage = {};
+        document.getElementById('confirmModal').classList.remove('open');
+        document.getElementById('adminModal').classList.remove('open');
+        document.body.style.overflow = '';
+        showToast('💥 ПОЛНЫЙ СБРОС ВЫПОЛНЕН');
+        SoundKit.semkaRumble();
+        setTimeout(function() { location.reload(); }, 1500);
+    }
+    confirmAction = null;
+}
+
+/* ================================================================
+   КЛЮЧИ
+   ================================================================ */
+var VALID_KEYS = [
+    'WERKA-A1B2-C3D4', 'WERKA-E5F6-G7H8', 'WERKA-J9K1-L2M3', 'WERKA-N4P5-Q6R7',
+    'WERKA-S8T9-U1V2', 'WERKA-W3X4-Y5Z6', 'WERKA-A7B8-C9D1', 'WERKA-E2F3-G4H5',
+    'WERKA-J6K7-L8M9', 'WERKA-N1P2-Q3R4', 'WERKA-S5T6-U7V8', 'WERKA-W9X1-Y2Z3',
+    'WERKA-A4B5-C6D7', 'WERKA-E8F9-G1H2', 'WERKA-J3K4-L5M6', 'WERKA-N7P8-Q9R1',
+    'WERKA-S2T3-U4V5', 'WERKA-W6X7-Y8Z9', 'WERKA-A1B2-C3D5', 'WERKA-E4F6-G7H9'
+];
+
+var KEY_STORAGE = 'werka_activated';
+var DOWNLOAD_LINK = '#';
+var ARCHIVE_PASSWORD = 'werka_2026';
+
+function checkActivation() {
+    var saved = SafeStorage.getItem(KEY_STORAGE);
+    if (saved) {
+        var data = null;
+        try { data = JSON.parse(saved); } catch(e) {}
+        if (data && data.activated) { showAccessBlock(data.key); return true; }
+    }
+    return false;
+}
+
+function showAccessBlock(key) {
+    var formBlock = document.getElementById('keyFormBlock');
+    var accessBlock = document.getElementById('accessBlock');
+    if (formBlock) formBlock.style.display = 'none';
+    if (accessBlock) accessBlock.classList.add('visible');
+}
+
+function activateKey() {
+    var input = document.getElementById('keyInput');
+    var message = document.getElementById('keyMessage');
+    var code = input.value.trim().toUpperCase();
+    message.className = 'key-message';
+    if (!code) { message.textContent = 'Введи ключ активации'; message.classList.add('error'); SoundKit.error(); return; }
+    if (VALID_KEYS.indexOf(code) !== -1) {
+        SafeStorage.setItem(KEY_STORAGE, JSON.stringify({ activated: true, key: code, date: new Date().toISOString() }));
+        message.textContent = '✓ Ключ активирован! Доступ открыт';
+        message.classList.add('success');
+        SoundKit.success();
+        showToast('Ключ активирован — доступ открыт!');
+        setTimeout(function() {
+            showAccessBlock(code);
+            var ab = document.getElementById('accessBlock');
+            if (ab) ab.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+    } else {
+        message.textContent = '✕ Неверный ключ. Проверь правильность ввода';
+        message.classList.add('error');
+        SoundKit.error();
+    }
+}
+
+function copyPassword() {
+    var password = document.getElementById('archivePassword').textContent;
+    try {
+        navigator.clipboard.writeText(password).then(function() { showToast('Пароль скопирован'); SoundKit.success(); })
+        .catch(function() {
+            var tmp = document.createElement('textarea'); tmp.value = password;
+            document.body.appendChild(tmp); tmp.select(); document.execCommand('copy');
+            document.body.removeChild(tmp); showToast('Пароль скопирован'); SoundKit.success();
+        });
+    } catch(e) { showToast('Пароль: ' + password); }
+}
+
+function handleDownload(e) {
+    e.preventDefault();
+    if (DOWNLOAD_LINK === '#' || !DOWNLOAD_LINK) { showToast('Ссылка на файл временно недоступна'); SoundKit.error(); return; }
+    SoundKit.success();
+    window.open(DOWNLOAD_LINK, '_blank');
+}
+
+function openOrderModal(total) {
+    document.getElementById('orderModalTotal').textContent = total + '₽';
+    document.getElementById('orderModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+/* ================================================================
+   SEMKA
+   ================================================================ */
+var semkaTimeout = null;
+
+function playSemkaAnimation() {
+    var overlay = document.getElementById('semkaOverlay');
+    if (!overlay) return;
+
+    var particleCount = 80;
+    if (window.innerWidth < 768) particleCount = 50;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) particleCount = 0;
+
+    var scene = overlay.querySelector('.semka-scene');
+
+    for (var i = 0; i < particleCount; i++) {
+        (function(idx) {
+            setTimeout(function() {
+                var p = document.createElement('div');
+                p.className = 'semka-particle';
+                if (Math.random() > 0.75) p.classList.add('stretch');
+                var startAngle = Math.random() * 360;
+                var startR = 500 + Math.random() * 400;
+                var colors = ['#ff3366', '#ff5555', '#ffaa33', '#ff8800', '#ffffff', '#ff8888'];
+                var color = colors[Math.floor(Math.random() * colors.length)];
+                p.style.background = color;
+                p.style.boxShadow = '0 0 12px ' + color + ', 0 0 24px ' + color;
+                var size = (1.5 + Math.random() * 4) + 'px';
+                p.style.width = size;
+                if (!p.classList.contains('stretch')) p.style.height = size;
+                p.style.setProperty('--start-angle', startAngle + 'deg');
+                p.style.setProperty('--start-r', startR + 'px');
+                p.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+                if (scene) scene.appendChild(p);
+                setTimeout(function() { p.remove(); }, 4000);
+            }, idx * 15);
+        })(i);
+    }
+
+    overlay.classList.add('active');
+    SoundKit.semkaRumble();
+    clearTimeout(semkaTimeout);
+    semkaTimeout = setTimeout(function() { overlay.classList.remove('active'); }, 4200);
+}
+
+/* ================================================================
+   ПРОМОКОДЫ
+   ================================================================ */
+var PROMOCODES = {
+    'SEMKA':   { discount: 15, label: '15%' },
+    'WERISED': { discount: 20, label: '20%' }
+};
+
+var activePromo = null;
+var cart = [];
+
+function applyPromo() {
+    var input = document.getElementById('promoInput');
+    var message = document.getElementById('promoMessage');
+    var code = input.value.trim().toUpperCase();
+    message.className = 'promo-message';
+    if (!code) { message.textContent = 'Введи промокод'; message.classList.add('error'); SoundKit.error(); return; }
+    if (PROMOCODES[code]) {
+        activePromo = { code: code, discount: PROMOCODES[code].discount, label: PROMOCODES[code].label };
+        message.textContent = '✓ Промокод "' + code + '" применён — скидка ' + PROMOCODES[code].label + '!';
+        message.classList.add('success');
+        SoundKit.success();
+        showToast('Промокод применён: ' + PROMOCODES[code].label + ' скидка');
+        updateProductPrices();
+        updateCartDisplay();
+        input.value = '';
+        input.disabled = true;
+        if (code === 'SEMKA') playSemkaAnimation();
+    } else {
+        message.textContent = '✕ Неверный промокод';
+        message.classList.add('error');
+        SoundKit.error();
+    }
+}
+
+function getDiscountedPrice(basePrice) {
+    if (!activePromo) return basePrice;
+    return Math.round(basePrice * (100 - activePromo.discount) / 100);
+}
+
+var _productPrices = null;
+
+function updateProductPrices() {
+    if (!_productPrices) {
+        _productPrices = document.querySelectorAll('.product .price');
+    }
+    for (var i = 0; i < _productPrices.length; i++) {
+        var priceEl = _productPrices[i];
+        var basePrice = parseInt(priceEl.getAttribute('data-price'));
+        if (!basePrice) continue;
+        var priceColor = priceEl.style.color || '#ff5555';
+        var discountedPrice = getDiscountedPrice(basePrice);
+        if (activePromo) {
+            priceEl.innerHTML = '<span class="price-old">' + basePrice + '₽</span><span class="price-current" style="color:' + priceColor + '">' + discountedPrice + '</span><small>₽</small><span class="price-discount-badge">−' + activePromo.discount + '%</span>';
+        } else {
+            priceEl.innerHTML = '<span class="price-current" style="color:' + priceColor + '">' + basePrice + '</span><small>₽</small>';
+        }
+    }
+}
+
+/* ================================================================
+   ЗВУКИ
+   ================================================================ */
+var SoundKit = (function() {
+    var ctx = null;
+    var lastPlay = {};
+    var noiseBuffer = null;
+
+    function getCtx() {
+        if (!ctx) {
+            try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+            catch(e) { return null; }
+        }
+        if (ctx.state === 'suspended') ctx.resume();
+        return ctx;
+    }
+
+    function getNoiseBuffer(c) {
+        if (noiseBuffer) return noiseBuffer;
+        var bufferSize = c.sampleRate * 0.5;
+        noiseBuffer = c.createBuffer(1, bufferSize, c.sampleRate);
+        var data = noiseBuffer.getChannelData(0);
+        for (var i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        return noiseBuffer;
+    }
+
+    function tone(opts) {
+        var c = getCtx();
+        if (!c) return;
+
+        var freq = opts.freq || 440;
+        var duration = opts.duration || 0.15;
+        var type = opts.type || 'sine';
+        var volume = opts.volume || 0.08;
+        var delay = opts.delay || 0;
+        var slideTo = opts.slideTo;
+        var attack = opts.attack || 0.005;
+
+        var osc = c.createOscillator();
+        var gain = c.createGain();
+
+        osc.type = type;
+        var startTime = c.currentTime + delay;
+        osc.frequency.setValueAtTime(freq, startTime);
+        if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, startTime + duration);
+
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(volume, startTime + attack);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+        var filter = c.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = opts.lowpass || 5000;
+        filter.Q.value = 0.7;
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(c.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + duration + 0.05);
+    }
+
+    function noise(opts) {
+        var c = getCtx();
+        if (!c) return;
+
+        var duration = opts.duration || 0.1;
+        var volume = opts.volume || 0.03;
+        var delay = opts.delay || 0;
+        var lowpass = opts.lowpass || 2000;
+
+        var buffer = getNoiseBuffer(c);
+        var source = c.createBufferSource();
+        source.buffer = buffer;
+
+        var filter = c.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = lowpass;
+
+        var gain = c.createGain();
+        gain.gain.setValueAtTime(volume, c.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + delay + duration);
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(c.destination);
+
+        source.start(c.currentTime + delay);
+        source.stop(c.currentTime + delay + duration + 0.05);
+    }
+
+    function throttle(key, ms) {
+        var now = performance.now();
+        if (lastPlay[key] && now - lastPlay[key] < ms) return false;
+        lastPlay[key] = now;
+        return true;
+    }
+
+    function btn() {
+        if (!throttle('btn', 70)) return;
+        tone({ freq: 880, duration: 0.05, type: 'sine', volume: 0.05, lowpass: 6000 });
+        tone({ freq: 1320, duration: 0.07, type: 'sine', volume: 0.035, delay: 0.02, lowpass: 8000 });
+        noise({ duration: 0.03, volume: 0.015, lowpass: 6000 });
+    }
+
+    function hover() {
+        if (!throttle('hover', 100)) return;
+        tone({ freq: 2400, duration: 0.025, type: 'sine', volume: 0.012, lowpass: 5000 });
+    }
+
+    function pop() {
+        if (!throttle('pop', 150)) return;
+        tone({ freq: 523, duration: 0.09, type: 'sine', volume: 0.07, slideTo: 784, lowpass: 3000 });
+        tone({ freq: 1046, duration: 0.11, type: 'sine', volume: 0.05, delay: 0.06, lowpass: 4000 });
+        noise({ duration: 0.05, volume: 0.02, lowpass: 3000 });
+    }
+
+    function error() {
+        if (!throttle('error', 200)) return;
+        tone({ freq: 220, duration: 0.14, type: 'sawtooth', volume: 0.04, slideTo: 160, lowpass: 800 });
+        tone({ freq: 180, duration: 0.16, type: 'sawtooth', volume: 0.035, delay: 0.08, slideTo: 140, lowpass: 800 });
+    }
+
+    function success() {
+        if (!throttle('success', 200)) return;
+        tone({ freq: 660, duration: 0.09, type: 'sine', volume: 0.05, lowpass: 5000 });
+        tone({ freq: 880, duration: 0.09, type: 'sine', volume: 0.05, delay: 0.07, lowpass: 5000 });
+        tone({ freq: 1174, duration: 0.16, type: 'sine', volume: 0.055, delay: 0.14, lowpass: 6000 });
+        noise({ duration: 0.08, volume: 0.015, delay: 0.14, lowpass: 5000 });
+    }
+
+    function open() {
+        if (!throttle('open', 150)) return;
+        tone({ freq: 440, duration: 0.14, type: 'sine', volume: 0.04, slideTo: 660, lowpass: 3000 });
+        noise({ duration: 0.12, volume: 0.02, lowpass: 2500 });
+    }
+
+    function close() {
+        if (!throttle('close', 150)) return;
+        tone({ freq: 660, duration: 0.12, type: 'sine', volume: 0.04, slideTo: 440, lowpass: 3000 });
+        noise({ duration: 0.1, volume: 0.018, lowpass: 2500 });
+    }
+
+    function semkaRumble() {
+        tone({ freq: 40, duration: 1.2, type: 'sine', volume: 0.14, lowpass: 200 });
+        tone({ freq: 55, duration: 1.0, type: 'sine', volume: 0.11, delay: 0.05, lowpass: 200 });
+        tone({ freq: 75, duration: 0.9, type: 'sine', volume: 0.09, delay: 0.1, lowpass: 250 });
+        tone({ freq: 110, duration: 0.8, type: 'sine', volume: 0.07, delay: 0.2, lowpass: 400 });
+        tone({ freq: 1046, duration: 0.3, type: 'sine', volume: 0.04, delay: 0.3, lowpass: 3000 });
+        tone({ freq: 1568, duration: 0.4, type: 'sine', volume: 0.035, delay: 0.5, lowpass: 4000 });
+        tone({ freq: 2093, duration: 0.5, type: 'sine', volume: 0.025, delay: 0.7, lowpass: 5000 });
+        noise({ duration: 0.6, volume: 0.04, delay: 0.9, lowpass: 400 });
+    }
+
+    return {
+        btn: btn, pop: pop, error: error, success: success,
+        open: open, close: close, hover: hover, semkaRumble: semkaRumble
+    };
+})();
+
+document.addEventListener('click', function(e) {
+    var target = e.target.closest('button, .btn, a');
+    if (!target) return;
+    if (target.dataset.sound === 'custom') return;
+    if (target.tagName === 'A' && target.href && target.href.indexOf('http') === 0) return;
+    SoundKit.btn();
+}, true);
+
+var hoverTargets = null;
+function bindHoverSound() {
+    if (hoverTargets) return;
+    hoverTargets = document.querySelectorAll('.product, .feature, .btn, .buy, .media-cta, .tg-btn, .auth-btn, .cart-btn, .admin-btn, .admin-action');
+    hoverTargets.forEach(function(el) {
+        el.addEventListener('mouseenter', function() { SoundKit.hover(); });
+    });
+}
+
+/* ================================================================
+   ЧАСЫ
+   ================================================================ */
+var clockInterval = null;
+function updateMskClock() {
+    var now = new Date();
+    var msk = new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(now);
+    var clockEl = document.getElementById('clockTime');
+    if (clockEl) clockEl.textContent = msk;
+}
+updateMskClock();
+clockInterval = setInterval(updateMskClock, 1000);
+
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        clearInterval(clockInterval);
+    } else {
+        updateMskClock();
+        clockInterval = setInterval(updateMskClock, 1000);
+    }
+});
+
+/* ================================================================
+   ХРАНИЛИЩЕ
+   ================================================================ */
+var STORAGE_USERS = 'werka_users';
+var STORAGE_CURRENT = 'werka_current_user';
+var STORAGE_APPS = 'werka_applications';
+
+function loadUsers() { try { return JSON.parse(SafeStorage.getItem(STORAGE_USERS)) || []; } catch(e) { return []; } }
+function saveUsers(users) { SafeStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
+function getCurrentUser() { try { return JSON.parse(SafeStorage.getItem(STORAGE_CURRENT)); } catch(e) { return null; } }
+function setCurrentUser(user) {
+    if (user) SafeStorage.setItem(STORAGE_CURRENT, JSON.stringify(user));
+    else SafeStorage.removeItem(STORAGE_CURRENT);
+}
+function loadApps() { try { return JSON.parse(SafeStorage.getItem(STORAGE_APPS)) || []; } catch(e) { return []; } }
+function saveApps(apps) { SafeStorage.setItem(STORAGE_APPS, JSON.stringify(apps)); }
+
+/* ================================================================
+   ОПРЕДЕЛЕНИЕ УСТРОЙСТВА
+   ================================================================ */
+function getArch() {
+    var ua = navigator.userAgent;
+    if (/WOW64|Win64|x64/.test(ua)) return 'x64';
+    if (/arm64|aarch64/i.test(ua)) return 'ARM64';
+    if (/arm/i.test(ua)) return 'ARM';
+    if (/x86|i686/i.test(ua)) return 'x86';
+    return navigator.platform || 'unknown';
+}
+
+function detectDevice() {
+    var ua = navigator.userAgent;
+    var platform = navigator.platform || '';
+    var badge = document.getElementById('deviceBadge');
+    var icon = document.getElementById('deviceIcon');
+    var name = document.getElementById('deviceName');
+    var meta = document.getElementById('deviceMeta');
+    var deviceType = 'Unknown', osName = 'Unknown', osVersion = '';
+
+    if (/Windows NT 10\.0/.test(ua)) {
+        osName = 'Windows';
+        if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+            navigator.userAgentData.getHighEntropyValues(['platformVersion'])
+                .then(function(hints) {
+                    var pv = parseInt(hints.platformVersion) || 0;
+                    var winVer = pv >= 13 ? '11' : '10';
+                    meta.textContent = 'Windows ' + winVer + ' · ' + getArch();
+                })
+                .catch(function() { meta.textContent = 'Windows 10/11 · ' + getArch(); });
+        } else { meta.textContent = 'Windows 10/11 · ' + getArch(); }
+        osVersion = '10/11';
+    } else if (/Mac OS X/.test(ua)) { osName = 'macOS'; meta.textContent = 'macOS · ' + getArch(); }
+    else if (/Android/.test(ua)) { osName = 'Android'; meta.textContent = 'Android · Mobile'; }
+    else if (/iPhone|iPad|iPod/.test(ua)) { osName = 'iOS'; meta.textContent = 'iOS · Mobile'; }
+    else if (/Linux/.test(ua)) { osName = 'Linux'; meta.textContent = 'Linux · ' + getArch(); }
+    else { meta.textContent = platform || 'Unknown'; }
+
+    var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+    var isTablet = /iPad|Tablet/i.test(ua);
+    var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    var screenW = window.screen.width;
+    var isLaptop = !isMobile && screenW <= 1920 && !isTouch;
+
+    if (isMobile || isTablet) { deviceType = isTablet ? 'Планшет' : 'Смартфон'; icon.textContent = '📱'; }
+    else if (osName === 'Windows') {
+        if (isLaptop && screenW <= 1600) { deviceType = 'Ноутбук'; icon.textContent = '💻'; }
+        else { deviceType = 'ПК'; icon.textContent = '🖥️'; }
+    } else if (osName === 'macOS') { deviceType = 'Mac'; icon.textContent = '🖥️'; }
+    else { deviceType = 'Устройство'; icon.textContent = '💻'; }
+
+    name.textContent = deviceType + ' · ' + osName + (osVersion ? ' ' + osVersion : '');
+    badge.addEventListener('click', function() { showToast(deviceType + ' · ' + osName + ' ' + osVersion + ' · ' + getArch()); });
+}
+
+detectDevice();
+
+/* ================================================================
+   АВТОРИЗАЦИЯ
+   ================================================================ */
+var authMode = 'login';
+
+function renderAuthSlot() {
+    var slot = document.getElementById('authSlot');
+    var user = getCurrentUser();
+    if (user) {
+        var initial = (user.nickname || user.email || 'U').charAt(0).toUpperCase();
+        var isAdmin = user.nickname === ADMIN_NICKNAME;
+        var chipClass = isAdmin ? 'user-chip is-admin' : 'user-chip';
+        var avatarClass = isAdmin ? 'user-avatar admin' : 'user-avatar';
+        var statusClass = isAdmin ? 'user-status admin-status' : 'user-status';
+        var statusText = isAdmin ? '● ROOT' : '● ONLINE';
+        slot.innerHTML = '<div class="' + chipClass + '" onclick="openProfile()">' +
+            '<div class="' + avatarClass + '">' + initial + '</div>' +
+            '<div class="user-info">' +
+                '<span class="user-nickname">' + (user.nickname || 'User') + '</span>' +
+                '<span class="' + statusClass + '">' + statusText + '</span>' +
+            '</div>' +
+        '</div>';
+    } else {
+        slot.innerHTML = '<button class="auth-btn" onclick="openAuth()">Войти</button>';
+    }
+    renderAdminSlot();
+    hoverTargets = null;
+    bindHoverSound();
+}
+
+function openAuth(mode) {
+    mode = mode || 'login';
+    switchTab(mode);
+    document.getElementById('authModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    SoundKit.open();
+}
+
+function closeAuth() {
+    document.getElementById('authModal').classList.remove('open');
+    document.body.style.overflow = '';
+    document.getElementById('authError').textContent = '';
+    document.querySelector('.auth-form').reset();
+    SoundKit.close();
+}
+
+function switchTab(mode) {
+    authMode = mode;
+    var tabLogin = document.getElementById('tabLogin');
+    var tabRegister = document.getElementById('tabRegister');
+    var nicknameField = document.getElementById('nicknameField');
+    var authTitle = document.getElementById('authTitle');
+    var authSubtitle = document.getElementById('authSubtitle');
+    var submitBtn = document.getElementById('authSubmitBtn');
+    var passwordInput = document.getElementById('authPassword');
+    var errorEl = document.getElementById('authError');
+    errorEl.textContent = '';
+
+    if (mode === 'login') {
+        tabLogin.classList.add('active'); tabRegister.classList.remove('active');
+        nicknameField.style.display = 'none';
+        authTitle.textContent = 'С возвращением';
+        authSubtitle.textContent = 'Войди в аккаунт, чтобы продолжить';
+        submitBtn.textContent = 'Войти';
+        passwordInput.setAttribute('autocomplete', 'current-password');
+    } else {
+        tabLogin.classList.remove('active'); tabRegister.classList.add('active');
+        nicknameField.style.display = 'flex';
+        authTitle.textContent = 'Создай аккаунт';
+        authSubtitle.textContent = 'Регистрация занимает 10 секунд';
+        submitBtn.textContent = 'Зарегистрироваться';
+        passwordInput.setAttribute('autocomplete', 'new-password');
+    }
+}
+
+function handleAuth(e) {
+    e.preventDefault();
+    var nickname = document.getElementById('authNickname').value.trim();
+    var email = document.getElementById('authEmail').value.trim().toLowerCase();
+    var password = document.getElementById('authPassword').value;
+    var errorEl = document.getElementById('authError');
+    errorEl.textContent = '';
+
+    if (!email || !password) { errorEl.textContent = 'Заполни все поля'; SoundKit.error(); return; }
+
+    var users = loadUsers();
+
+    if (authMode === 'register') {
+        if (!nickname) { errorEl.textContent = 'Придумай никнейм'; SoundKit.error(); return; }
+        if (nickname.length < 3) { errorEl.textContent = 'Никнейм минимум 3 символа'; SoundKit.error(); return; }
+        if (users.find(function(u) { return u.email === email; })) { errorEl.textContent = 'Этот email уже зарегистрирован'; SoundKit.error(); return; }
+        if (users.find(function(u) { return u.nickname.toLowerCase() === nickname.toLowerCase(); })) { errorEl.textContent = 'Этот никнейм уже занят'; SoundKit.error(); return; }
+        if (nickname !== ADMIN_NICKNAME && password.length < 6) { errorEl.textContent = 'Пароль минимум 6 символов'; SoundKit.error(); return; }
+
+        var newUser = { nickname: nickname, email: email, password: btoa(password), createdAt: new Date().toISOString(), orders: 0, apps: 0 };
+        users.push(newUser);
+        saveUsers(users);
+        setCurrentUser(newUser);
+        renderAuthSlot();
+        SoundKit.success();
+        closeAuth();
+        if (nickname === ADMIN_NICKNAME) showToast('🛡️ ADMIN вошёл — доступ открыт');
+        else showToast('Добро пожаловать, ' + nickname + '!');
+        return;
+    }
+
+    var user = users.find(function(u) { return u.email === email; });
+    if (!user) { errorEl.textContent = 'Аккаунт не найден'; SoundKit.error(); return; }
+    if (user.password !== btoa(password)) { errorEl.textContent = 'Неверный пароль'; SoundKit.error(); return; }
+
+    setCurrentUser(user);
+    renderAuthSlot();
+    SoundKit.success();
+    closeAuth();
+    if (user.nickname === ADMIN_NICKNAME) showToast('🛡️ ADMIN вошёл — доступ открыт');
+    else showToast('С возвращением, ' + user.nickname + '!');
+}
+
+function logout() {
+    setCurrentUser(null);
+    renderAuthSlot();
+    closeProfile();
+    SoundKit.close();
+    showToast('Ты вышел из аккаунта');
+}
+
+function openProfile() {
+    var user = getCurrentUser();
+    if (!user) return;
+    var initial = (user.nickname || user.email || 'U').charAt(0).toUpperCase();
+    document.getElementById('profileAvatarBig').textContent = initial;
+    document.getElementById('profileNickname').textContent = user.nickname || 'User';
+    document.getElementById('profileEmail').textContent = user.email;
+
+    var avatarBig = document.getElementById('profileAvatarBig');
+    if (user.nickname === ADMIN_NICKNAME) avatarBig.classList.add('admin');
+    else avatarBig.classList.remove('admin');
+
+    var apps = loadApps().filter(function(a) { return a.email === user.email; });
+    document.getElementById('profileOrders').textContent = user.orders || 0;
+    document.getElementById('profileApps').textContent = apps.length;
+
+    document.getElementById('profileModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    SoundKit.open();
+}
+
+function closeProfile() {
+    document.getElementById('profileModal').classList.remove('open');
+    document.body.style.overflow = '';
+    SoundKit.close();
+}
+
+/* ================================================================
+   ЗАЯВКИ
+   ================================================================ */
+var applyType = 'media';
+
+function openApply(type) {
+    applyType = type;
+    var modal = document.getElementById('applyModal');
+    var icon = document.getElementById('applyIcon');
+    var title = document.getElementById('applyTitle');
+    var subtitle = document.getElementById('applySubtitle');
+    var videoField = document.getElementById('videoUploadField');
+    var hint = document.getElementById('applyHint');
+
+    if (type === 'media') {
+        icon.textContent = '🎬'; title.textContent = 'Заявка на медиа';
+        subtitle.textContent = 'Заполни форму — отвечу в Telegram в течение 24 часов';
+        videoField.style.display = 'flex';
+        hint.innerHTML = 'Заявка сохранится локально. После отправки свяжись со мной в Telegram — <b>@werised</b>';
+    } else {
+        icon.textContent = '🤝'; title.textContent = 'Заявка на партнёрку';
+        subtitle.textContent = 'Напиши о себе — обсудим условия в Telegram';
+        videoField.style.display = 'none';
+        hint.innerHTML = 'Заявка сохранится локально. После отправки напиши мне в Telegram — <b>@werised</b>';
+    }
+
+    var user = getCurrentUser();
+    if (user) document.getElementById('applyNickname').value = user.nickname || '';
+
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    SoundKit.open();
+}
+
+function closeApply() {
+    document.getElementById('applyModal').classList.remove('open');
+    document.body.style.overflow = '';
+    document.querySelector('.apply-form').reset();
+    document.getElementById('applyError').textContent = '';
+    document.getElementById('fileUploadLabel').classList.remove('has-file');
+    document.getElementById('fileUploadLabel').innerHTML = '<span class="file-icon">📤</span><span class="file-text">Нажми, чтобы загрузить ролик</span><span class="file-hint">MP4, MOV · до 100 МБ</span>';
+    SoundKit.close();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var fileInput = document.getElementById('applyVideo');
+    var label = document.getElementById('fileUploadLabel');
+    if (fileInput && label) {
+        fileInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var sizeMB = (file.size / 1024 / 1024).toFixed(1);
+            if (file.size > 100 * 1024 * 1024) { showToast('Файл больше 100 МБ'); SoundKit.error(); fileInput.value = ''; return; }
+            SoundKit.success();
+            label.classList.add('has-file');
+            label.innerHTML = '<span class="file-icon">✅</span><span class="file-text">' + file.name + '</span><span class="file-hint">' + sizeMB + ' МБ · готово к отправке</span>';
+        });
+    }
+});
+
+function handleApply(e) {
+    e.preventDefault();
+    var user = getCurrentUser();
+    if (!user) { closeApply(); showToast('Сначала войди в аккаунт'); setTimeout(function() { openAuth('login'); }, 300); return; }
+    var nickname = document.getElementById('applyNickname').value.trim();
+    var channel = document.getElementById('applyChannel').value.trim();
+    var contact = document.getElementById('applyContact').value.trim();
+    var comment = document.getElementById('applyComment').value.trim();
+    var videoFile = document.getElementById('applyVideo').files[0];
+    var errorEl = document.getElementById('applyError');
+    errorEl.textContent = '';
+
+    if (!nickname || !channel || !contact) { errorEl.textContent = 'Заполни обязательные поля'; SoundKit.error(); return; }
+    if (applyType === 'media' && !videoFile) { errorEl.textContent = 'Загрузи ролик для заявки на медиа'; SoundKit.error(); return; }
+
+    var apps = loadApps();
+    apps.push({ type: applyType, email: user.email, nickname: nickname, channel: channel, contact: contact, comment: comment, videoName: videoFile ? videoFile.name : null, videoSize: videoFile ? videoFile.size : null, createdAt: new Date().toISOString() });
+    saveApps(apps);
+
+    var users = loadUsers();
+    var idx = users.findIndex(function(u) { return u.email === user.email; });
+    if (idx !== -1) { users[idx].apps = (users[idx].apps || 0) + 1; saveUsers(users); setCurrentUser(users[idx]); }
+
+    SoundKit.success();
+    closeApply();
+    showToast('Заявка отправлена! Свяжись с @werised в Telegram');
+}
+
+/* ================================================================
+   КОРЗИНА
+   ================================================================ */
+function addToCart(id, name, price, color) {
+    var user = getCurrentUser();
+    if (!user) { SoundKit.error(); showToast('Сначала войди в аккаунт'); setTimeout(function() { openAuth('login'); }, 300); return; }
+    var existing = cart.find(function(item) { return item.id === id; });
+    if (existing) existing.qty++;
+    else cart.push({ id: id, name: name, price: price, color: color, qty: 1 });
+    updateCartDisplay();
+    SoundKit.pop();
+    showToast(name + ' добавлен в корзину');
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(function(item) { return item.id !== id; });
+    updateCartDisplay();
+    SoundKit.btn();
+}
+
+function changeQty(id, delta) {
+    var item = cart.find(function(i) { return i.id === id; });
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) removeFromCart(id);
+    else { updateCartDisplay(); SoundKit.btn(); }
+}
+
+function updateCartDisplay() {
+    var count = cart.reduce(function(sum, item) { return sum + item.qty; }, 0);
+    document.getElementById('cartCount').textContent = count;
+    var itemsContainer = document.getElementById('cartItems');
+    var footer = document.getElementById('cartFooter');
+
+    if (cart.length === 0) {
+        itemsContainer.innerHTML = '<div class="cart-empty">Корзина пуста</div>';
+        footer.style.display = 'none';
+        return;
+    }
+
+    footer.style.display = 'block';
+    itemsContainer.innerHTML = cart.map(function(item) {
+        var itemPrice = getDiscountedPrice(item.price);
+        var priceHtml = activePromo ? '<span class="old-price">' + item.price + '₽</span><span class="new-price">' + itemPrice + '₽</span>' : item.price + '₽';
+        return '<div class="cart-item">' +
+            '<svg class="cart-item-sword" viewBox="0 0 32 32" fill="none" style="color: ' + getColor(item.color) + '">' +
+                '<rect x="14" y="3" width="4" height="19" fill="currentColor"/>' +
+                '<rect x="10" y="19" width="12" height="4" fill="currentColor" opacity="0.8"/>' +
+                '<rect x="14" y="23" width="4" height="7" fill="#8b6914"/>' +
+            '</svg>' +
+            '<div class="cart-item-info"><div class="cart-item-name">' + item.name + '</div><div class="cart-item-price">' + priceHtml + ' × ' + item.qty + '</div></div>' +
+            '<div class="cart-item-qty"><button class="qty-btn" onclick="changeQty(\'' + item.id + '\', -1)">−</button><span class="qty-num">' + item.qty + '</span><button class="qty-btn" onclick="changeQty(\'' + item.id + '\', 1)">+</button></div>' +
+            '<button class="cart-item-remove" onclick="removeFromCart(\'' + item.id + '\')">✕</button>' +
+        '</div>';
+    }).join('');
+
+    var subtotal = cart.reduce(function(sum, item) { return sum + item.price * item.qty; }, 0);
+    var total = subtotal;
+    var discountAmount = 0;
+
+    if (activePromo) {
+        discountAmount = Math.round(subtotal * activePromo.discount / 100);
+        total = subtotal - discountAmount;
+        document.getElementById('cartPromoApplied').style.display = 'flex';
+        document.getElementById('cartPromoCode').textContent = activePromo.code;
+        document.getElementById('cartPromoDiscount').textContent = activePromo.label;
+        document.getElementById('cartDiscount').style.display = 'flex';
+        document.getElementById('cartDiscountValue').textContent = '−' + discountAmount + '₽';
+    } else {
+        document.getElementById('cartPromoApplied').style.display = 'none';
+        document.getElementById('cartDiscount').style.display = 'none';
+    }
+
+    document.getElementById('cartTotal').textContent = total + '₽';
+}
+
+function getColor(color) {
+    var colors = { green: '#ff5555', gold: '#ffcc33', purple: '#a855f7' };
+    return colors[color] || '#ff5555';
+}
+
+function toggleCart() {
+    var isOpening = !document.getElementById('cartPanel').classList.contains('open');
+    document.getElementById('cartPanel').classList.toggle('open');
+    document.getElementById('cartOverlay').classList.toggle('open');
+    if (isOpening) SoundKit.open(); else SoundKit.close();
+}
+
+var toastTimeout;
+function showToast(msg) {
+    var toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function() { toast.classList.remove('show'); }, 2800);
+}
+
+function checkout() {
+    if (cart.length === 0) return;
+    var user = getCurrentUser();
+    if (!user) { toggleCart(); showToast('Войди в аккаунт для заказа'); setTimeout(function() { openAuth('login'); }, 300); return; }
+    var subtotal = cart.reduce(function(sum, item) { return sum + item.price * item.qty; }, 0);
+    var finalTotal = subtotal;
+    if (activePromo) finalTotal = subtotal - Math.round(subtotal * activePromo.discount / 100);
+
+    var users = loadUsers();
+    var idx = users.findIndex(function(u) { return u.email === user.email; });
+    if (idx !== -1) { users[idx].orders = (users[idx].orders || 0) + 1; saveUsers(users); setCurrentUser(users[idx]); }
+
+    toggleCart();
+    openOrderModal(finalTotal);
+
+    cart = [];
+    activePromo = null;
+    document.getElementById('promoInput').disabled = false;
+    document.getElementById('promoMessage').textContent = '';
+    document.getElementById('promoMessage').className = 'promo-message';
+    updateProductPrices();
+    updateCartDisplay();
+
+    SoundKit.success();
+}
+
+/* ================================================================
+   MOTION BLUR
+   ================================================================ */
+var lastY = window.scrollY;
+var lastTime = performance.now();
+var blurTimeout = null;
+var blurRafPending = false;
+
+function updateMotionBlur() {
+    blurRafPending = false;
+    var now = performance.now();
+    var dt = now - lastTime;
+    var dy = Math.abs(window.scrollY - lastY);
+    var velocity = dt > 0 ? dy / dt * 16 : 0;
+    lastY = window.scrollY;
+    lastTime = now;
+    document.body.classList.remove('motion-fast', 'motion-faster');
+    if (velocity > 25) document.body.classList.add('motion-faster');
+    else if (velocity > 10) document.body.classList.add('motion-fast');
+    clearTimeout(blurTimeout);
+    blurTimeout = setTimeout(function() { document.body.classList.remove('motion-fast', 'motion-faster'); }, 100);
+}
+
+window.addEventListener('scroll', function() {
+    if (blurRafPending) return;
+    blurRafPending = true;
+    requestAnimationFrame(updateMotionBlur);
+}, { passive: true });
+
+/* КУРСОР */
+var cursor = document.getElementById('cursor');
+var isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+if (isTouchDevice) {
+    cursor.style.display = 'none';
+} else {
+    var mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+    var cursorRafPending = false;
+
+    document.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!cursorRafPending) {
+            cursorRafPending = true;
+            requestAnimationFrame(animateCursor);
+        }
+    }, { passive: true });
+
+    function animateCursor() {
+        cursorX += (mouseX - cursorX) * 0.15;
+        cursorY += (mouseY - cursorY) * 0.15;
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+        cursorRafPending = false;
+        if (Math.abs(mouseX - cursorX) > 0.1 || Math.abs(mouseY - cursorY) > 0.1) {
+            cursorRafPending = true;
+            requestAnimationFrame(animateCursor);
+        }
+    }
+}
+
+function bindHoverCursor() {
+    if (isTouchDevice) return;
+    document.querySelectorAll('a, button, .product, .feature, .perk, .promo-box, .media-feature, .media-stat, .device-card, .device-badge, .user-chip, .auth-tab').forEach(function(el) {
+        el.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
+        el.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+    });
+}
+
+/* БЛЮР ПО КРАЯМ */
+var blurTop = document.getElementById('blurTop');
+var blurBottom = document.getElementById('blurBottom');
+var lastScroll = 0;
+var scrollDirection = 'down';
+var scrollRafPending = false;
+
+window.addEventListener('scroll', function() {
+    if (scrollRafPending) return;
+    scrollRafPending = true;
+    requestAnimationFrame(function() {
+        scrollRafPending = false;
+        var scrollY = window.scrollY;
+        var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        if (scrollY > lastScroll) scrollDirection = 'down';
+        else if (scrollY < lastScroll) scrollDirection = 'up';
+        lastScroll = scrollY;
+        if (scrollY > 100) blurTop.classList.add('active');
+        else blurTop.classList.remove('active');
+        if (scrollDirection === 'up' && scrollY < maxScroll - 100 && scrollY > 50) blurBottom.classList.add('active');
+        else blurBottom.classList.remove('active');
+    });
+}, { passive: true });
+
+/* REVEAL */
+var reveals = document.querySelectorAll('.reveal');
+var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) { entry.target.classList.add('active'); observer.unobserve(entry.target); }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
+reveals.forEach(function(el) { observer.observe(el); });
+
+/* ПЛАВНЫЙ СКРОЛЛ */
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+        var t = document.querySelector(this.getAttribute('href'));
+        if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+});
+
+/* АКТИВНАЯ ССЫЛКА */
+var sections = document.querySelectorAll('section[id], .creator');
+var navLinks = document.querySelectorAll('.nav-links a');
+var navRafPending = false;
+
+window.addEventListener('scroll', function() {
+    if (navRafPending) return;
+    navRafPending = true;
+    requestAnimationFrame(function() {
+        navRafPending = false;
+        var current = '';
+        sections.forEach(function(s) { var top = s.offsetTop - 200; if (scrollY >= top) current = s.id; });
+        navLinks.forEach(function(a) { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+    });
+}, { passive: true });
+
+/* ЗАКРЫТИЕ МОДАЛОК */
+document.getElementById('authModal').addEventListener('click', function(e) { if (e.target.id === 'authModal') closeAuth(); });
+document.getElementById('applyModal').addEventListener('click', function(e) { if (e.target.id === 'applyModal') closeApply(); });
+document.getElementById('profileModal').addEventListener('click', function(e) { if (e.target.id === 'profileModal') closeProfile(); });
+document.getElementById('orderModal').addEventListener('click', function(e) { if (e.target.id === 'orderModal') closeOrderModal(); });
+document.getElementById('adminModal').addEventListener('click', function(e) { if (e.target.id === 'adminModal') closeAdmin(); });
+document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target.id === 'confirmModal') closeConfirm(); });
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeAuth(); closeApply(); closeProfile(); closeOrderModal(); closeAdmin(); closeConfirm();
+    }
+});
+
+/* ИНИЦИАЛИЗАЦИЯ */
+renderAuthSlot();
+updateProductPrices();
+updateCartDisplay();
+bindHoverCursor();
+bindHoverSound();
+checkActivation();
+</script>
+
+</body>
+</html>
